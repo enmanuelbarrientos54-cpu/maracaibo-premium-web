@@ -1,5 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { IntroProvider, useIntro } from './context/IntroContext'
+import { LangProvider, useLang } from './i18n/LangContext'
 import { CinematicIntro } from './components/CinematicIntro'
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
@@ -24,6 +25,27 @@ import { ScrollTrigger } from './lib/gsap'
 
 function Site() {
   const { playing, revealed } = useIntro()
+  const { lang, t } = useLang()
+
+  // Switching language remounts <main> (scroll scenes re-measure their new text).
+  // Keep the visitor on the same section while that happens.
+  const scrollBefore = useRef(0)
+  const firstLang = useRef(true)
+  if (typeof window !== 'undefined') scrollBefore.current = window.scrollY
+  useLayoutEffect(() => {
+    if (firstLang.current) {
+      firstLang.current = false
+      return
+    }
+    const y = scrollBefore.current
+    window.dispatchEvent(new Event('mcb:hold-header'))
+    ScrollTrigger.refresh()
+    window.scrollTo(0, y)
+    requestAnimationFrame(() => {
+      ScrollTrigger.refresh()
+      window.scrollTo(0, y)
+    })
+  }, [lang])
 
   useEffect(() => {
     initSmoothScroll()
@@ -47,11 +69,11 @@ function Site() {
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-full focus:bg-brass focus:px-5 focus:py-3 focus:text-ink"
       >
-        Skip to content
+        {t('Skip to content')}
       </a>
       {playing && <CinematicIntro />}
       <Header />
-      <main id="main" aria-hidden={playing && !revealed ? true : undefined}>
+      <main key={lang} id="main" aria-hidden={playing && !revealed ? true : undefined}>
         <Hero />
         <Marquee words={[...restaurant.homepageHighlights, 'Cachapas']} />
         <Story />
@@ -75,8 +97,10 @@ function Site() {
 
 export default function App() {
   return (
-    <IntroProvider>
-      <Site />
-    </IntroProvider>
+    <LangProvider>
+      <IntroProvider>
+        <Site />
+      </IntroProvider>
+    </LangProvider>
   )
 }

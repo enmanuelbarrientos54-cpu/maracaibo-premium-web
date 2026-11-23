@@ -9,12 +9,14 @@ import { Motif } from '../components/Motif'
 import { DishModal } from '../components/DishModal'
 import { formatPrice, menuGroups, menuItems, type MenuGroupId, type MenuItem } from '../data/menu'
 import { links, restaurant } from '../data/restaurant'
+import { useLang } from '../i18n/LangContext'
 
 gsap.registerPlugin(Flip)
 
 type Filter = 'all' | MenuGroupId
 
 export function MenuSection() {
+  const { t } = useLang()
   const ref = useRef<HTMLElement>(null)
   const grid = useRef<HTMLDivElement>(null)
   const chips = useRef<HTMLDivElement>(null)
@@ -29,9 +31,9 @@ export function MenuSection() {
     return menuItems.filter((item) => {
       if (filter !== 'all' && item.group !== filter) return false
       if (!q) return true
-      return [item.name, item.english, item.description].some((t) => t?.toLowerCase().includes(q))
+      return [item.name, item.english, item.description, item.description && t(item.description)].some((s) => s?.toLowerCase().includes(q))
     })
-  }, [filter, query])
+  }, [filter, query, t])
 
   const captureFlip = () => {
     if (!grid.current || prefersReducedMotion()) return
@@ -111,20 +113,19 @@ export function MenuSection() {
       <div className="container-x relative">
         <Reveal className="grid gap-10 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-7">
-            <Eyebrow index="02">The Menu</Eyebrow>
+            <Eyebrow index="02">{t('The Menu')}</Eyebrow>
             <SplitWords
               id="menu-title"
               className="display-lg mt-8 text-ivory"
-              lines={['What looks', { text: 'good?', accent: true }]}
+              lines={[t('What looks'), { text: t('good?'), accent: true }]}
             />
           </div>
           <div className="space-y-5 lg:col-span-5">
             <p data-fade className="leading-relaxed text-cream/80">
-              A first taste of Maracaibo’s kitchen. This preview shows dishes confirmed on the restaurant’s official
-              menu pages — the complete, always-current menu and prices live on the official site.
+              {t('A first taste of Maracaibo’s kitchen. This preview shows dishes confirmed on the restaurant’s official menu pages — the complete, always-current menu and prices live on the official site.')}
             </p>
             <div data-fade>
-              <StatusTag>Verified from maracaibonj.com</StatusTag>
+              <StatusTag>{t('Verified from maracaibonj.com')}</StatusTag>
             </div>
           </div>
         </Reveal>
@@ -135,11 +136,11 @@ export function MenuSection() {
             <div
               ref={chips}
               role="group"
-              aria-label="Filter dishes by category"
+              aria-label={t("Filter dishes by category")}
               className="no-scrollbar relative -mx-1 flex gap-1 overflow-x-auto px-1"
             >
               <span ref={indicator} aria-hidden className="absolute bottom-0 left-0 top-0 rounded-full bg-brass" />
-              {[{ id: 'all' as const, label: 'All dishes' }, ...menuGroups].map((g) => {
+              {[{ id: 'all' as const, label: t('All dishes') }, ...menuGroups].map((g) => {
                 const on = filter === g.id
                 return (
                   <button
@@ -160,7 +161,7 @@ export function MenuSection() {
             </div>
 
             <label className="group relative flex min-h-11 w-full items-center rounded-full border border-ivory/15 px-5 transition-colors focus-within:border-brass lg:w-80">
-              <span className="sr-only">Search dishes</span>
+              <span className="sr-only">{t('Search dishes')}</span>
               <svg viewBox="0 0 24 24" className="mr-3 h-4 w-4 shrink-0 text-sand" aria-hidden>
                 <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
                 <path d="M16 16l4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -172,7 +173,7 @@ export function MenuSection() {
                   captureFlip()
                   setQuery(e.target.value)
                 }}
-                placeholder="Search ceviche, cachapa…"
+                placeholder={t("Search ceviche, cachapa…")}
                 className="w-full bg-transparent py-3 text-sm text-ivory placeholder:text-mute focus:outline-none"
               />
             </label>
@@ -181,7 +182,7 @@ export function MenuSection() {
 
         {/* Grid */}
         <p className="sr-only" aria-live="polite">
-          {visible.length} {visible.length === 1 ? 'dish' : 'dishes'} shown
+          {visible.length} {visible.length === 1 ? t('dish shown') : t('dishes shown')}
         </p>
         <div ref={grid} className="relative mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3">
           {visible.map((item) => (
@@ -189,11 +190,11 @@ export function MenuSection() {
           ))}
           {visible.length === 0 && (
             <div className="col-span-full rounded-sm border border-dashed border-ivory/15 px-6 py-16 text-center">
-              <p className="font-display text-2xl text-ivory">Nothing here yet for “{query}”.</p>
+              <p className="font-display text-2xl text-ivory">{t('Nothing here yet for')} “{query}”.</p>
               <p className="mt-3 text-sand">
-                This preview lists verified dishes only —{' '}
+                {t('This preview lists verified dishes only —')}{' '}
                 <a className="link-underline text-brass" href={links.menu} target="_blank" rel="noopener noreferrer">
-                  browse the full official menu ↗
+                  {t('browse the full official menu')} ↗
                 </a>
               </p>
             </div>
@@ -204,13 +205,13 @@ export function MenuSection() {
         <Reveal className="mt-24 md:mt-32">
           <div className="flex flex-col justify-between gap-6 border-t border-ivory/10 pt-10 md:flex-row md:items-end">
             <div>
-              <p data-fade className="eyebrow text-brass">House classics</p>
+              <p data-fade className="eyebrow text-brass">{t('House classics')}</p>
               <h3 data-fade className="display-md mt-4 max-w-xl text-ivory">
-                The flavors Maracaibo is known for.
+                {t('The flavors Maracaibo is known for.')}
               </h3>
             </div>
             <p data-fade className="max-w-sm text-sm leading-relaxed text-sand">
-              Featured on the official homepage. Varieties and prices are listed on the official menu.
+              {t('Featured on the official homepage. Varieties and prices are listed on the official menu.')}
             </p>
           </div>
           <ul className="mt-10 grid grid-cols-2 border-l border-t border-ivory/10 md:grid-cols-4">
@@ -231,7 +232,7 @@ export function MenuSection() {
                       {name}
                     </span>
                     <span className="mt-3 block text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-sand transition-colors duration-700 group-hover:text-ink/70">
-                      See on official menu ↗
+                      {t('See on official menu')} ↗
                     </span>
                   </span>
                 </a>
@@ -242,15 +243,14 @@ export function MenuSection() {
 
         <div className="mt-16 flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
           <p className="max-w-xl text-sm leading-relaxed text-sand">
-            Prices and availability follow the official menu at maracaibonj.com and may change. Dishes without a
-            confirmed price show “See official menu”.
+            {t('Prices and availability follow the official menu at maracaibonj.com and may change. Dishes without a confirmed price show “See official menu”.')}
           </p>
           <div className="flex flex-wrap gap-3">
             <LinkButton href={links.menu} external>
-              Full Official Menu
+              {t('Full Official Menu')}
             </LinkButton>
             <LinkButton href={links.order} external variant="ghost">
-              Order Online
+              {t('Order Online')}
             </LinkButton>
           </div>
         </div>
@@ -262,8 +262,10 @@ export function MenuSection() {
 }
 
 function DishCard({ item, index, onOpen }: { item: MenuItem; index: number; onOpen: () => void }) {
+  const { t, lang } = useLang()
   const group = menuGroups.find((g) => g.id === item.group)!
   const price = formatPrice(item.price)
+  const sub = item.description ? t(item.description) : lang === 'en' ? item.english : undefined
   return (
     <article data-card data-flip-id={item.id} className="group relative">
       <button
@@ -301,20 +303,20 @@ function DishCard({ item, index, onOpen }: { item: MenuItem; index: number; onOp
           <span className="block font-display text-[1.9rem] font-light leading-[1.05] tracking-[-0.01em] text-ivory md:text-[2.1rem]">
             {item.name}
           </span>
-          {(item.english || item.description) && (
+          {sub && (
             <span className="mt-3 line-clamp-2 block text-sm leading-relaxed text-cream/70">
-              {item.description ?? item.english}
+              {sub}
             </span>
           )}
           <span className="mt-5 flex items-center justify-between border-t border-ivory/10 pt-4">
             {price ? (
               <span className="font-display text-xl text-ivory">{price}</span>
             ) : (
-              <span className="text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-sand">See official menu</span>
+              <span className="text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-sand">{t('See official menu')}</span>
             )}
             <span className="grid h-9 w-9 place-items-center rounded-full border border-ivory/20 text-ivory transition-[background-color,color,border-color] duration-500 group-hover:border-brass group-hover:bg-brass group-hover:text-ink">
               <span aria-hidden>+</span>
-              <span className="sr-only">View details for {item.name}</span>
+              <span className="sr-only">{t('View details for')} {item.name}</span>
             </span>
           </span>
         </span>

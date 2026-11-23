@@ -2,6 +2,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from '../lib/gsap'
 import { scrollToTarget, startScroll, stopScroll } from '../lib/smoothScroll'
 import { links, restaurant } from '../data/restaurant'
+import { useLang } from '../i18n/LangContext'
+import { LangToggle } from './LangToggle'
+import { FullscreenToggle } from './FullscreenToggle'
 
 const items = [
   { label: 'Menu', href: '#menu', img: '/images/signature-platter.webp' },
@@ -26,6 +29,7 @@ export function FullscreenNav({ open, onClose }: { open: boolean; onClose: (rest
   const tl = useRef<gsap.core.Timeline | null>(null)
   const [preview, setPreview] = useState(items[0].img)
   const [mounted, setMounted] = useState(false)
+  const { t } = useLang()
 
   useLayoutEffect(() => {
     const el = root.current
@@ -92,13 +96,13 @@ export function FullscreenNav({ open, onClose }: { open: boolean; onClose: (rest
       id="site-menu"
       role="dialog"
       aria-modal="true"
-      aria-label="Site menu"
+      aria-label={t("Site menu")}
       aria-hidden={!open}
       className="fixed inset-0 z-40 overflow-y-auto bg-espresso text-ivory"
     >
       <div className="lattice pointer-events-none absolute inset-0 opacity-40" />
       <div className="container-x relative grid min-h-full grid-cols-1 gap-10 pb-10 pt-24 md:pt-32 lg:grid-cols-12">
-        <nav aria-label="Site sections" className="lg:col-span-7">
+        <nav aria-label={t("Site sections")} className="lg:col-span-7">
           <ol className="space-y-1 md:space-y-0">
             {items.map((item, i) => (
               <li key={item.href} className="overflow-hidden">
@@ -113,7 +117,7 @@ export function FullscreenNav({ open, onClose }: { open: boolean; onClose: (rest
                   <span className="nav-link-inner inline-flex items-baseline gap-5">
                     <span className="w-7 font-display text-sm text-brass/70">{String(i + 1).padStart(2, '0')}</span>
                     <span className="font-display text-[clamp(2.2rem,6vw,4.6rem)] font-light leading-[1.05] tracking-[-0.02em] transition-[color,transform] duration-700 [transition-timing-function:var(--ease-soft)] group-hover:translate-x-3 group-hover:text-brass">
-                      {item.label}
+                      {t(item.label)}
                     </span>
                   </span>
                 </a>
@@ -139,8 +143,15 @@ export function FullscreenNav({ open, onClose }: { open: boolean; onClose: (rest
           </div>
 
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+            <div data-nav-fade className="sm:col-span-2">
+              <p className="eyebrow mb-3 text-brass">Idioma · Language</p>
+              <div className="flex flex-wrap items-center gap-3">
+                <LangToggle />
+                <FullscreenToggle />
+              </div>
+            </div>
             <div data-nav-fade>
-              <p className="eyebrow mb-4 text-brass">Services</p>
+              <p className="eyebrow mb-4 text-brass">{t('Services')}</p>
               <ul className="space-y-2.5">
                 {services.map((s) => (
                   <li key={s.label}>
@@ -151,14 +162,14 @@ export function FullscreenNav({ open, onClose }: { open: boolean; onClose: (rest
                       rel="noopener noreferrer"
                       className="link-underline text-sm text-cream/85 hover:text-ivory"
                     >
-                      {s.label} <span aria-hidden>↗</span>
+                      {t(s.label)} <span aria-hidden>↗</span>
                     </a>
                   </li>
                 ))}
               </ul>
             </div>
             <div data-nav-fade className="space-y-4 text-sm text-cream/80">
-              <p className="eyebrow text-brass">Visit</p>
+              <p className="eyebrow text-brass">{t('Visit')}</p>
               <p>
                 {restaurant.address.line1}
                 <br />

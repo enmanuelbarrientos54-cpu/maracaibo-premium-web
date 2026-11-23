@@ -5,6 +5,7 @@ import { formatPrice, menuGroups, type MenuItem } from '../data/menu'
 import { links } from '../data/restaurant'
 import { Motif } from './Motif'
 import { LinkButton } from './ui'
+import { useLang } from '../i18n/LangContext'
 
 /** Expanded dish presentation. Only shows data present in the menu file. */
 export function DishModal({ item, onClose }: { item: MenuItem | null; onClose: () => void }) {
@@ -12,6 +13,7 @@ export function DishModal({ item, onClose }: { item: MenuItem | null; onClose: (
   const root = useRef<HTMLDivElement>(null)
   const closeBtn = useRef<HTMLButtonElement>(null)
   const lastFocus = useRef<HTMLElement | null>(null)
+  const { t, lang } = useLang()
 
   useEffect(() => {
     if (item) {
@@ -94,7 +96,7 @@ export function DishModal({ item, onClose }: { item: MenuItem | null; onClose: (
           type="button"
           onClick={onClose}
           className="absolute right-4 top-4 z-10 grid h-11 w-11 place-items-center rounded-full border border-ivory/25 bg-ink/50 text-ivory backdrop-blur transition-colors hover:border-brass hover:text-brass md:right-6 md:top-6"
-          aria-label="Close dish details"
+          aria-label={t("Close dish details")}
         >
           ✕
         </button>
@@ -107,48 +109,49 @@ export function DishModal({ item, onClose }: { item: MenuItem | null; onClose: (
             </div>
           )}
           <span className="absolute left-5 top-5 rounded-full bg-ink/60 px-3 py-1 text-[0.6rem] uppercase tracking-[0.2em] text-sand backdrop-blur">
-            {shown.image ? group.english : 'Photography pending'}
+            {shown.image ? t(group.english) : t('Photography pending')}
           </span>
         </div>
 
         <div className="flex flex-col p-7 md:p-12">
           <p data-dm className="eyebrow pr-12 text-brass">
-            {group.label} · {group.english}
+            {group.label}
+            {lang === 'en' && ` · ${group.english}`}
           </p>
           <h3 id="dm-title" data-dm className="mt-8 font-display text-[clamp(2.2rem,4vw,3.4rem)] font-light leading-[1.02] tracking-[-0.02em] text-ivory">
             {shown.name}
           </h3>
-          {shown.english && (
+          {lang === 'en' && shown.english && (
             <p data-dm className="mt-3 font-display text-lg italic text-brass/90">
               {shown.english}
             </p>
           )}
           {shown.description && (
             <p data-dm className="mt-6 text-lg leading-relaxed text-cream/85">
-              {shown.description}
+              {t(shown.description)}
             </p>
           )}
           {shown.note && (
             <p data-dm className="mt-4 text-sm uppercase tracking-[0.18em] text-sand">
-              {shown.note}
+              {t(shown.note)}
             </p>
           )}
 
           <div data-dm className="mt-auto pt-10">
             <div className="flex items-end justify-between border-t border-ivory/10 pt-6">
-              <span className="eyebrow text-sand">Price</span>
+              <span className="eyebrow text-sand">{t('Price')}</span>
               {price ? (
                 <span className="font-display text-3xl text-ivory">{price}</span>
               ) : (
-                <span className="text-sm text-sand">Listed on the official menu</span>
+                <span className="text-sm text-sand">{t('Listed on the official menu')}</span>
               )}
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <LinkButton href={links.order} external>
-                Order Online
+                {t('Order Online')}
               </LinkButton>
               <LinkButton href={shown.source} external variant="ghost">
-                View on official site
+                {t('View on official site')}
               </LinkButton>
             </div>
           </div>

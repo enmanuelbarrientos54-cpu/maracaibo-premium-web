@@ -4,6 +4,7 @@ import { useGsap } from '../hooks/useGsap'
 import { ease, mix } from '../lib/motion'
 import { formatPrice, menuGroups, menuItems } from '../data/menu'
 import { Motif } from '../components/Motif'
+import { useLang } from '../i18n/LangContext'
 
 /**
  * Pinned scene: a giant gradient wordmark drifts while menu cards (verified
@@ -19,6 +20,7 @@ const orbitItems = [
 ].map((id) => menuItems.find((m) => m.id === id)!)
 
 export function FlavorOrbit() {
+  const { t, lang } = useLang()
   const ref = useRef<HTMLElement>(null)
 
   useGsap(ref, ({ reduced, q }) => {
@@ -80,10 +82,10 @@ export function FlavorOrbit() {
 
   return (
     <section ref={ref} id="flavors" aria-labelledby="flavors-title" className="relative bg-ink">
-      <div className="orbit-stage relative h-[100svh] overflow-hidden [perspective:1400px]">
+      <div className="orbit-stage relative h-[100svh] supports-[height:100lvh]:h-[100lvh] overflow-hidden [perspective:1400px]">
         <div className="lattice pointer-events-none absolute inset-0 opacity-20 [mask-image:radial-gradient(70%_60%_at_70%_50%,black,transparent)]" />
         <div className="container-x relative z-30 flex h-full flex-col justify-start pt-24 md:justify-center md:pt-0">
-          <p data-orbit-fade className="eyebrow mb-5 text-brass">House flavors</p>
+          <p data-orbit-fade className="eyebrow mb-5 text-brass">{t('House flavors')}</p>
           <h2
             id="flavors-title"
             className="orbit-title font-display text-[clamp(3.2rem,10.5vw,10rem)] font-light leading-[0.82] tracking-[-0.04em] text-transparent will-change-transform"
@@ -99,7 +101,7 @@ export function FlavorOrbit() {
             <span className="block text-[0.42em] italic tracking-[-0.02em]">Union City.</span>
           </h2>
           <p data-orbit-fade className="mt-6 max-w-sm leading-relaxed text-cream/80 md:mt-8">
-            Venezuelan classics and Caribbean fusion, plated to share. A few dishes from the official menu.
+            {t('Venezuelan classics and Caribbean fusion, plated to share. A few dishes from the official menu.')}
           </p>
         </div>
 
@@ -119,17 +121,17 @@ export function FlavorOrbit() {
               <Motif kind={group.motif} className="mx-auto h-20 w-20 text-brass-deep/80" />
               <div>
                 <p className="font-display text-[1.55rem] leading-[1.02] text-ink">{item.name}</p>
-                {(item.english || item.description) && (
-                  <p className="mt-2 line-clamp-2 text-[0.7rem] leading-snug text-umber">{item.english ?? item.description}</p>
+                {(lang === 'en' ? item.english ?? item.description : item.description) && (
+                  <p className="mt-2 line-clamp-2 text-[0.7rem] leading-snug text-umber">{lang === 'en' ? item.english ?? item.description : t(item.description!)}</p>
                 )}
-                <p className="mt-3 border-t border-ink/15 pt-2 font-display text-lg text-wine">{price ?? 'See menu'}</p>
+                <p className="mt-3 border-t border-ink/15 pt-2 font-display text-lg text-wine">{price ?? t('See menu')}</p>
               </div>
             </article>
           )
         })}
         <article className="orbit-card absolute left-0 top-0 h-[300px] w-[220px] overflow-hidden rounded-[3px] bg-[#f3ead9] p-2 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] will-change-transform">
-          <img src="/images/signature-platter.webp" alt="Platter photographed at Maracaibo" className="h-[240px] w-full object-cover" loading="lazy" />
-          <p className="px-1 pt-2 text-center font-display text-sm italic text-umber">Made to share</p>
+          <img src="/images/signature-platter.webp" alt={t('Platter photographed at Maracaibo')} className="h-[240px] w-full object-cover" loading="lazy" />
+          <p className="px-1 pt-2 text-center font-display text-sm italic text-umber">{t('Made to share')}</p>
         </article>
       </div>
     </section>

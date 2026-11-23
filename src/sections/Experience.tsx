@@ -5,6 +5,7 @@ import { useGsap } from '../hooks/useGsap'
 import { Eyebrow } from '../components/ui'
 import { SplitWords } from '../components/SplitWords'
 import { Reveal } from '../components/Reveal'
+import { useLang } from '../i18n/LangContext'
 
 interface Panel {
   src: string
@@ -57,6 +58,7 @@ const panels: Panel[] = [
 ]
 
 export function Experience() {
+  const { t } = useLang()
   const ref = useRef<HTMLElement>(null)
 
   useGsap(ref, ({ reduced, q }) => {
@@ -121,13 +123,13 @@ export function Experience() {
       <div className="cf-stage relative hidden h-[100svh] overflow-hidden [perspective:1600px] lg:block">
         <div className="cf-heading container-x absolute inset-y-0 left-0 z-[60] flex max-w-[40rem] flex-col justify-center">
           <Reveal start="top 80%">
-            <Eyebrow index="03">The Experience</Eyebrow>
-            <SplitWords id="exp-title" className="display-lg mt-8 text-ivory" lines={['Step', { text: 'inside.', accent: true }]} />
+            <Eyebrow index="03">{t('The Experience')}</Eyebrow>
+            <SplitWords id="exp-title" className="display-lg mt-8 text-ivory" lines={[t('Step'), { text: t('inside.'), accent: true }]} />
             <p data-fade className="mt-8 max-w-md leading-relaxed text-cream/80">
-              From the street to the reception sign — a walk through the spaces of Maracaibo.
+              {t('From the street to the reception sign — a walk through the spaces of Maracaibo.')}
             </p>
             <p data-fade className="mt-10 flex items-center gap-4 text-[0.66rem] uppercase tracking-[0.24em] text-sand">
-              Keep scrolling <span aria-hidden className="inline-block h-px w-12 bg-brass" />
+              {t('Keep scrolling')} <span aria-hidden className="inline-block h-px w-12 bg-brass" />
             </p>
           </Reveal>
         </div>
@@ -136,16 +138,16 @@ export function Experience() {
             <li key={p.title} className="cf-card absolute left-0 top-0 w-[min(46vw,96vh)] will-change-transform [transform-style:preserve-3d]">
               <figure>
                 <div className="relative aspect-[16/10] overflow-hidden rounded-[2px] shadow-[0_50px_90px_-40px_rgba(0,0,0,0.9)] [-webkit-box-reflect:below_6px_linear-gradient(transparent_72%,rgba(0,0,0,0.22))]">
-                  <img src={p.src} alt={p.alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+                  <img src={p.src} alt={t(p.alt)} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
                   {p.concept && (
                     <span className="absolute bottom-3 left-3 rounded-full bg-ink/60 px-3 py-1 text-[0.58rem] uppercase tracking-[0.2em] text-ivory/80">
-                      Concept still · AI-rendered
+                      {t('Concept still · AI-rendered')}
                     </span>
                   )}
                 </div>
                 <figcaption className="cf-caption mt-8 text-center opacity-0">
-                  <span className="block font-display text-3xl font-light text-ivory">{p.title}</span>
-                  <span className="mx-auto mt-2 block max-w-sm text-sm leading-relaxed text-sand">{p.text}</span>
+                  <span className="block font-display text-3xl font-light text-ivory">{t(p.title)}</span>
+                  <span className="mx-auto mt-2 block max-w-sm text-sm leading-relaxed text-sand">{t(p.text)}</span>
                 </figcaption>
               </figure>
             </li>
@@ -161,10 +163,10 @@ export function Experience() {
       {/* Phones & tablets: native swipe carousel */}
       <div className="py-24 lg:hidden">
         <Reveal className="container-x" start="top 80%">
-          <Eyebrow index="03">The Experience</Eyebrow>
-          <SplitWords className="display-lg mt-8 text-ivory" lines={['Step', { text: 'inside.', accent: true }]} />
+          <Eyebrow index="03">{t('The Experience')}</Eyebrow>
+          <SplitWords className="display-lg mt-8 text-ivory" lines={[t('Step'), { text: t('inside.'), accent: true }]} />
           <p data-fade className="mt-8 max-w-md leading-relaxed text-cream/80">
-            From the street to the reception sign — a walk through the spaces of Maracaibo.
+            {t('From the street to the reception sign — a walk through the spaces of Maracaibo.')}
           </p>
         </Reveal>
         <ol className="no-scrollbar mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto px-[clamp(1.25rem,4vw,3.5rem)] pb-2">
@@ -172,18 +174,18 @@ export function Experience() {
             <li key={p.title} className="w-[82vw] shrink-0 snap-center sm:w-[60vw]">
               <figure>
                 <div className="relative aspect-[4/5] overflow-hidden rounded-[2px]">
-                  <img src={p.src} alt={p.alt} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+                  <img src={p.src} alt={t(p.alt)} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
                   {p.concept && (
                     <span className="absolute bottom-3 left-3 rounded-full bg-ink/60 px-3 py-1 text-[0.58rem] uppercase tracking-[0.2em] text-ivory/80">
-                      Concept still · AI-rendered
+                      {t('Concept still · AI-rendered')}
                     </span>
                   )}
                 </div>
                 <figcaption className="mt-5 flex gap-5">
                   <span className="font-display text-sm text-brass">{String(i + 1).padStart(2, '0')}</span>
                   <span>
-                    <span className="block font-display text-2xl font-light text-ivory">{p.title}</span>
-                    <span className="mt-1 block max-w-xs text-sm leading-relaxed text-sand">{p.text}</span>
+                    <span className="block font-display text-2xl font-light text-ivory">{t(p.title)}</span>
+                    <span className="mt-1 block max-w-xs text-sm leading-relaxed text-sand">{t(p.text)}</span>
                   </span>
                 </figcaption>
               </figure>

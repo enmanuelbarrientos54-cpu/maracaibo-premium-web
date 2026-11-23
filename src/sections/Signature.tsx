@@ -3,12 +3,14 @@ import { gsap } from '../lib/gsap'
 import { useGsap } from '../hooks/useGsap'
 import { SplitWords } from '../components/SplitWords'
 import { Reveal } from '../components/Reveal'
+import { useLang } from '../i18n/LangContext'
 
 /**
  * Pinned cinematic moment: the platter starts as a framed plate and opens up
  * to fill the screen as you scroll, while the headline counter-moves.
  */
 export function Signature() {
+  const { t } = useLang()
   const ref = useRef<HTMLElement>(null)
 
   useGsap(ref, ({ reduced, q }) => {
@@ -67,7 +69,7 @@ export function Signature() {
           aria-hidden
           className="sig-marquee absolute left-0 top-[calc(50%-8.5vw)] whitespace-nowrap font-display text-[17vw] font-light italic leading-none text-transparent [-webkit-text-stroke:1px_rgba(201,167,106,0.38)] will-change-transform"
         >
-          From the grill · to the table · Maracaibo · From the grill ·
+          {t('From the grill · to the table · Maracaibo · From the grill ·')}
         </p>
         {[
           { cls: 'sig-echo-l', src: '/images/reception.webp', cap: 'The welcome' },
@@ -79,13 +81,13 @@ export function Signature() {
             className={`sig-echo ${e.cls} absolute left-[calc(50%-11vw)] top-[calc(50%-14.5vw)] w-[22vw] bg-[#f3ead9] p-[0.7vw] pb-[2.6vw] opacity-0 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.8)] will-change-transform`}
           >
             <img src={e.src} alt="" loading="lazy" className="aspect-[4/5] w-full object-cover" />
-            <figcaption className="absolute inset-x-0 bottom-[0.6vw] text-center font-display text-[1.1vw] italic text-umber">{e.cap}</figcaption>
+            <figcaption className="absolute inset-x-0 bottom-[0.6vw] text-center font-display text-[1.1vw] italic text-umber">{t(e.cap)}</figcaption>
           </figure>
         ))}
         <div className="sig-frame absolute inset-0" style={{ clipPath: 'inset(22% 30% 22% 30% round 999px)' }}>
           <img
             src="/images/signature-platter.webp"
-            alt="A Maracaibo platter on a round wooden board: crispy pork belly skewer, chorizo, fried cheese, grilled steak, yuca and plantain chips."
+            alt={t("A Maracaibo platter on a round wooden board: crispy pork belly skewer, chorizo, fried cheese, grilled steak, yuca and plantain chips.")}
             loading="lazy"
             className="sig-img h-full w-full object-cover"
           />
@@ -94,19 +96,19 @@ export function Signature() {
 
         <div className="pointer-events-none absolute inset-0 flex items-center justify-between px-[4vw]">
           <p className="sig-left font-display text-[clamp(3rem,7vw,7.5rem)] font-light leading-none tracking-[-0.03em] text-ivory">
-            From the
+            {t('From the')}
           </p>
           <p className="sig-right font-display text-[clamp(3rem,7vw,7.5rem)] font-light italic leading-none tracking-[-0.03em] text-brass">
-            grill
+            {t('grill')}
           </p>
         </div>
 
         <div className="sig-caption container-x absolute inset-x-0 bottom-0 pb-14 opacity-0">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <h2 id="sig-title" className="display-md max-w-xl text-ivory">
-              Built for the center of the table — <span className="italic-accent">made to be shared.</span>
+              {t('Built for the center of the table —')} <span className="italic-accent">{t('made to be shared.')}</span>
             </h2>
-            <p className="eyebrow text-sand">Photographed at Maracaibo</p>
+            <p className="eyebrow text-sand">{t('Photographed at Maracaibo')}</p>
           </div>
         </div>
       </div>
@@ -116,18 +118,18 @@ export function Signature() {
         <Reveal className="container-x mb-10">
           <SplitWords
             className="display-lg text-ivory"
-            lines={['From the', { text: 'grill,', accent: true }, 'to the table.']}
+            lines={[t('From the'), { text: t('grill,'), accent: true }, t('to the table.')]}
           />
         </Reveal>
         <div className="sig-frame-m relative aspect-[4/5] overflow-hidden">
           <img
             src="/images/signature-platter.webp"
-            alt="A Maracaibo platter on a round wooden board: crispy pork belly skewer, chorizo, fried cheese, grilled steak, yuca and plantain chips."
+            alt={t("A Maracaibo platter on a round wooden board: crispy pork belly skewer, chorizo, fried cheese, grilled steak, yuca and plantain chips.")}
             loading="lazy"
             className="h-full w-full object-cover"
           />
         </div>
-        <p className="container-x eyebrow mt-6 text-sand">Photographed at Maracaibo · made to be shared</p>
+        <p className="container-x eyebrow mt-6 text-sand">{t('Photographed at Maracaibo · made to be shared')}</p>
       </div>
     </section>
   )

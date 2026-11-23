@@ -4,6 +4,8 @@ import { scrollToTarget } from '../lib/smoothScroll'
 import { links } from '../data/restaurant'
 import { useIntro } from '../context/IntroContext'
 import { FullscreenNav } from './FullscreenNav'
+import { LangToggle } from './LangToggle'
+import { useLang } from '../i18n/LangContext'
 
 export const primaryNav = [
   { label: 'Menu', href: '#menu' },
@@ -20,6 +22,7 @@ export function Header() {
   const [open, setOpen] = useState(false)
   const [solid, setSolid] = useState(false)
   const { revealed } = useIntro()
+  const { t } = useLang()
 
   // Entrance once the intro hands over
   useEffect(() => {
@@ -40,17 +43,27 @@ export function Header() {
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    // After a language switch the page re-measures and restores scroll; keep the header (and its toggle) in view.
+    let holdUntil = 0
+    const hold = () => {
+      holdUntil = performance.now() + 1500
+      gsap.to(el, { yPercent: 0, duration: 0.4, ease: 'power3.out', overwrite: 'auto' })
+    }
+    window.addEventListener('mcb:hold-header', hold)
     const st = ScrollTrigger.create({
       start: 0,
       end: 'max',
       onUpdate: (self) => {
         const y = self.scroll()
         setSolid(y > window.innerHeight * 0.6)
-        const hide = self.direction === 1 && y > window.innerHeight * 0.9
+        const hide = performance.now() > holdUntil && self.direction === 1 && y > window.innerHeight * 0.9
         gsap.to(el, { yPercent: hide ? -110 : 0, duration: 0.6, ease: 'power3.out', overwrite: 'auto' })
       },
     })
-    return () => st.kill()
+    return () => {
+      st.kill()
+      window.removeEventListener('mcb:hold-header', hold)
+    }
   }, [])
 
   const go = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -72,14 +85,14 @@ export function Header() {
             onClick={(e) => go(e, '#top')}
             data-head
             className="group flex items-baseline gap-3"
-            aria-label="Maracaibo — back to top"
+            aria-label={t("Maracaibo — back to top")}
           >
-            <span className="font-display text-[1.15rem] font-normal tracking-[0.38em] text-ivory md:text-[1.3rem]">
+            <span className="font-display text-[1rem] font-normal tracking-[0.26em] text-ivory sm:text-[1.15rem] sm:tracking-[0.38em] md:text-[1.3rem]">
               MARACAIBO
             </span>
           </a>
 
-          <nav aria-label="Primary" className="hidden min-[1380px]:block">
+          <nav aria-label={t("Primary")} className="hidden min-[1380px]:block">
             <ul className="flex items-center gap-7 2xl:gap-9">
               {primaryNav.map((item) => (
                 <li key={item.href} data-head>
@@ -88,7 +101,7 @@ export function Header() {
                     onClick={(e) => go(e, item.href)}
                     className="link-underline whitespace-nowrap py-1 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-ivory/80 transition-colors hover:text-ivory"
                   >
-                    {item.label}
+                    {t(item.label)}
                   </a>
                 </li>
               ))}
@@ -96,6 +109,9 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2 md:gap-3">
+            <div data-head>
+              <LangToggle size="sm" />
+            </div>
             <a
               data-head
               href={links.order}
@@ -103,15 +119,15 @@ export function Header() {
               rel="noopener noreferrer"
               className="btn btn-ghost hidden whitespace-nowrap !min-h-10 !px-5 !text-[0.64rem] md:inline-flex"
             >
-              Order Online<span className="sr-only"> (opens in a new tab)</span>
+              {t('Order Online')}<span className="sr-only"> {t('(opens in a new tab)')}</span>
             </a>
             <a
               data-head
               href="#reserve"
               onClick={(e) => go(e, '#reserve')}
-              className="btn btn-solid !min-h-10 !px-4 !text-[0.64rem] md:!px-5"
+              className="btn btn-solid hidden !min-h-10 !px-4 !text-[0.64rem] sm:inline-flex md:!px-5"
             >
-              Reserve
+              {t('Reserve')}
             </a>
             <button
               ref={toggleRef}
@@ -120,7 +136,7 @@ export function Header() {
               onClick={() => setOpen((o) => !o)}
               aria-expanded={open}
               aria-controls="site-menu"
-              aria-label={open ? 'Close menu' : 'Open menu'}
+              aria-label={open ? t('Close menu') : t('Open menu')}
               className="relative ml-1 grid h-11 w-11 place-items-center rounded-full border border-ivory/20 transition-colors hover:border-ivory/60"
             >
               <span

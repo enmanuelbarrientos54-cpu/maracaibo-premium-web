@@ -1,9 +1,11 @@
 import { useRef } from 'react'
 import { gsap } from '../lib/gsap'
 import { useGsap } from '../hooks/useGsap'
+import { useLang } from '../i18n/LangContext'
 
 /** The wordmark starts as a field of brass dots and fills with colour as it scrolls into place. */
 export function Stamp() {
+  const { t } = useLang()
   const ref = useRef<HTMLElement>(null)
   useGsap(ref, ({ reduced, q }) => {
     if (reduced) {
@@ -47,7 +49,7 @@ export function Stamp() {
           {word}
         </span>
       </div>
-      <p className="stamp-sub eyebrow mt-8 text-center text-sand">Venezuelan &amp; Caribbean cuisine · Union City, NJ</p>
+      <p className="stamp-sub eyebrow mt-8 text-center text-sand">{t('Venezuelan & Caribbean cuisine')} · Union City, NJ</p>
     </section>
   )
 }

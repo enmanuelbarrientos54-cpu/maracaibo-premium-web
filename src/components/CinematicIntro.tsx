@@ -2,6 +2,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { gsap } from '../lib/gsap'
 import { useIntro } from '../context/IntroContext'
 import { startScroll, stopScroll } from '../lib/smoothScroll'
+import { useLang } from '../i18n/LangContext'
+import { LangToggle } from './LangToggle'
 
 /**
  * Full-screen cinematic introduction.
@@ -49,7 +51,7 @@ function pickSource(): Source {
 const CAPTIONS = [
   { at: 0, text: 'Union City, New Jersey' },
   { at: 4.2, text: '1218 John F. Kennedy Blvd' },
-  { at: 8.6, text: 'Bienvenidos' },
+  { at: 8.6, text: 'Welcome' },
 ]
 
 const OUTRO_LEAD = 1.15 // seconds before the end the outro begins
@@ -57,6 +59,7 @@ const BRAND = 'MARACAIBO'.split('')
 
 export function CinematicIntro() {
   const { reveal, finish } = useIntro()
+  const { t } = useLang()
   const root = useRef<HTMLDivElement>(null)
   const video = useRef<HTMLVideoElement>(null)
   const progress = useRef<HTMLDivElement>(null)
@@ -184,7 +187,8 @@ export function CinematicIntro() {
       ref={root}
       className="fixed inset-0 z-[100] overflow-hidden bg-ink text-ivory"
       role="region"
-      aria-label="Maracaibo introduction film"
+      aria-label={t("Maracaibo introduction film")}
+      data-intro-root
     >
       {/* Media */}
       <div className="intro-media absolute inset-0 origin-[50%_60%]">
@@ -228,13 +232,14 @@ export function CinematicIntro() {
       {/* Chrome: wordmark, skip, captions, progress */}
       <div className="intro-chrome absolute inset-0">
         <div className="absolute left-0 right-0 top-0 flex items-center justify-between px-5 pt-[max(1.25rem,env(safe-area-inset-top))] md:px-10 md:pt-8">
-          <span className="font-display text-sm tracking-[0.42em] text-ivory/85">MARACAIBO</span>
+          <span className="hidden font-display text-sm tracking-[0.42em] text-ivory/85 sm:inline">MARACAIBO</span>
+          <LangToggle size="sm" />
           <button
             type="button"
             onClick={skip}
             className="group flex min-h-11 items-center gap-3 rounded-full border border-ivory/25 bg-ink/55 px-5 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-ivory/90 transition-colors duration-500 hover:border-ivory/60 hover:text-ivory"
           >
-            Skip intro
+            {t('Skip intro')}
             <span aria-hidden className="inline-block transition-transform duration-500 group-hover:translate-x-1">
               →
             </span>
@@ -245,27 +250,27 @@ export function CinematicIntro() {
           <div className="mb-4 flex items-end justify-between gap-6">
             <p key={caption} className="intro-caption eyebrow text-ivory/85" aria-live="off">
               <span className="mr-3 inline-block h-px w-8 translate-y-[-3px] bg-brass align-middle" />
-              {CAPTIONS[caption].text}
+              {t(CAPTIONS[caption].text)}
             </p>
             <p className="hidden text-[0.62rem] uppercase tracking-[0.22em] text-ivory/45 sm:block">
-              Concept film · AI-rendered
+              {t('Concept film · AI-rendered')}
             </p>
           </div>
           <div className="h-px w-full bg-ivory/15">
             <div ref={progress} className="h-px origin-left bg-brass" style={{ transform: 'scaleX(0)' }} />
           </div>
           <p className="mt-3 text-[0.6rem] uppercase tracking-[0.22em] text-ivory/45 sm:hidden">
-            Concept film · AI-rendered
+            {t('Concept film · AI-rendered')}
           </p>
         </div>
 
         {phase === 'blocked' && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 bg-ink/55 px-6 text-center">
             <button type="button" onClick={playManually} className="btn btn-solid">
-              Play the film <span className="btn-arrow">▸</span>
+              {t('Play the film')} <span className="btn-arrow">▸</span>
             </button>
             <button type="button" onClick={skip} className="link-underline text-xs uppercase tracking-[0.24em] text-ivory/80">
-              Enter the site
+              {t('Enter the site')}
             </button>
           </div>
         )}
@@ -273,7 +278,7 @@ export function CinematicIntro() {
 
       {/* Brand reveal */}
       <div className="intro-brand pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-        <p className="intro-sub eyebrow mb-6 text-brass opacity-0">Union City · New Jersey</p>
+        <p className="intro-sub eyebrow mb-6 text-brass opacity-0">{t('Union City · New Jersey')}</p>
         <h2 className="flex overflow-hidden font-display text-[clamp(2.6rem,11vw,9.5rem)] font-light leading-none tracking-[0.06em]" aria-label="Maracaibo">
           {BRAND.map((l, i) => (
             <span key={i} className="inline-block overflow-hidden pb-[0.06em]" aria-hidden>
@@ -283,7 +288,7 @@ export function CinematicIntro() {
         </h2>
         <div className="intro-rule mt-6 h-px w-40 origin-center scale-x-0 bg-brass md:w-64" />
         <p className="intro-sub mt-6 font-display text-lg italic text-cream/90 opacity-0 md:text-2xl">
-          Venezuelan &amp; Caribbean cuisine
+          {t('Venezuelan & Caribbean cuisine')}
         </p>
       </div>
     </div>

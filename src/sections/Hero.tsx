@@ -7,10 +7,12 @@ import { LinkButton } from '../components/ui'
 import { links, restaurant } from '../data/restaurant'
 import { scrollToTarget } from '../lib/smoothScroll'
 import { todaysHours } from '../lib/hours'
+import { useLang } from '../i18n/LangContext'
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null)
   const { revealed } = useIntro()
+  const { t } = useLang()
 
   // Scroll-linked depth: photo drifts, copy lifts and fades as you leave the hero.
   useGsap(ref, ({ reduced, q }) => {
@@ -68,8 +70,8 @@ export function Hero() {
             src="/images/reception.webp"
             srcSet="/images/reception-640.webp 640w, /images/reception.webp 2560w"
             sizes="100vw"
-            alt="Maracaibo's reception: the backlit MARACAIBO sign above a brass-lattice host stand flanked by gold lanterns."
-            fetchPriority="high"
+            alt={t("Maracaibo's reception: the backlit MARACAIBO sign above a brass-lattice host stand flanked by gold lanterns.")}
+            {...{ fetchpriority: 'high' }}
             className="hero-img h-full w-full object-cover object-[62%_30%] will-change-transform md:object-[50%_35%]"
           />
         </picture>
@@ -87,18 +89,18 @@ export function Hero() {
       <div className="hero-copy container-x relative pb-24 pt-32 md:pb-16">
         <p data-hero-fade className="eyebrow mb-6 flex items-center gap-4 text-ivory/90 [text-shadow:0_1px_12px_rgba(0,0,0,0.6)] md:mb-8">
           <span className="inline-block h-px w-10 bg-brass/70" />
-          {restaurant.tagline} · Union City, NJ
+          {t(restaurant.tagline)} · Union City, NJ
         </p>
 
         <SplitWords
           as="h1"
           className="display-xl max-w-[14ch] text-ivory"
-          lines={['Venezuelan soul,', { text: 'Caribbean light.', accent: true }]}
+          lines={[t('Venezuelan soul,'), { text: t('Caribbean light.'), accent: true }]}
         />
 
         <div className="mt-8 grid gap-8 md:mt-12 md:grid-cols-12 md:items-end">
           <p data-hero-fade className="max-w-md text-[0.98rem] leading-relaxed text-cream/85 md:col-span-5 md:text-base">
-            {restaurant.concept}
+            {t(restaurant.concept)}
           </p>
           <div data-hero-fade className="flex flex-wrap gap-3 md:col-span-7 md:justify-end">
             <a
@@ -109,7 +111,7 @@ export function Hero() {
               }}
               className="btn btn-solid"
             >
-              <span>Explore Menu</span>
+              <span>{t('Explore Menu')}</span>
               <span aria-hidden className="btn-arrow">
                 ↓
               </span>
@@ -122,13 +124,13 @@ export function Hero() {
               }}
               className="btn btn-ghost"
             >
-              <span>Reserve a Table</span>
+              <span>{t('Reserve a Table')}</span>
               <span aria-hidden className="btn-arrow">
                 →
               </span>
             </a>
             <LinkButton href={links.order} external variant="ghost">
-              Order Online
+              {t('Order Online')}
             </LinkButton>
           </div>
         </div>
@@ -140,7 +142,7 @@ export function Hero() {
           <span>{restaurant.address.full}</span>
           <span className="flex items-center gap-3">
             <span className="h-1.5 w-1.5 rounded-full bg-brass" />
-            Today · {today.time}
+            {t('Today')} · {t(today.time)}
           </span>
         </div>
       </div>
@@ -150,7 +152,7 @@ export function Hero() {
         aria-hidden
         className="pointer-events-none absolute bottom-6 right-6 hidden flex-col items-center gap-3 text-[0.58rem] uppercase tracking-[0.3em] text-ivory/60 lg:flex"
       >
-        <span className="[writing-mode:vertical-rl]">Scroll</span>
+        <span className="[writing-mode:vertical-rl]">{t('Scroll')}</span>
         <span className="relative h-14 w-px overflow-hidden bg-ivory/15">
           <span className="absolute inset-x-0 top-0 h-1/2 animate-[scrollcue_2.2s_var(--ease-cine)_infinite] bg-brass" />
         </span>

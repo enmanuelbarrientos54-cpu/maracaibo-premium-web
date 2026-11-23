@@ -1,4 +1,5 @@
 import type { AnchorHTMLAttributes, ReactNode } from 'react'
+import { useLang } from '../i18n/LangContext'
 
 type Variant = 'solid' | 'ghost' | 'dark'
 
@@ -12,13 +13,14 @@ interface LinkButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
 /** Pill button rendered as a link. External links open in a new tab with rel safety. */
 export function LinkButton({ variant = 'solid', external, arrow = '→', className = '', children, ...rest }: LinkButtonProps) {
   const ext = external ? { target: '_blank', rel: 'noopener noreferrer' } : {}
+  const { t } = useLang()
   return (
     <a className={`btn btn-${variant} ${className}`} {...ext} {...rest}>
       <span>{children}</span>
       <span aria-hidden className="btn-arrow">
         {external ? '↗' : arrow}
       </span>
-      {external && <span className="sr-only"> (opens in a new tab)</span>}
+      {external && <span className="sr-only"> {t('(opens in a new tab)')}</span>}
     </a>
   )
 }
