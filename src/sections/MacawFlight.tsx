@@ -65,7 +65,33 @@ export function MacawFlight() {
     v.setAttribute('playsinline', '')
     v.setAttribute('webkit-playsinline', '')
     const resumeAt = shown.current
+    let blobUrl = ''
+    let cancelled = false
     v.load()
+    // Scroll control needs a seekable file. Servers without byte-range support make
+    // a video unseekable: then load it into memory (always seekable) and, if even
+    // that fails, fall back to playing it once in real time.
+    const ensureSeekable = () => {
+      const ok = v.seekable.length > 0 && v.seekable.end(v.seekable.length - 1) >= v.duration - 0.5
+      if (ok || mode.current !== 'scroll' || blobUrl) return
+      fetch(variant.src)
+        .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+        .then((b) => {
+          if (cancelled) return
+          blobUrl = URL.createObjectURL(b)
+          v.src = blobUrl
+          v.load()
+          v.addEventListener('loadeddata', prime, { once: true })
+        })
+        .catch(() => {
+          mode.current = 'autoplay'
+        })
+    }
+    v.addEventListener('loadedmetadata', ensureSeekable, { once: true })
+    const onError = () => {
+      if (blobUrl) mode.current = 'autoplay'
+    }
+    v.addEventListener('error', onError)
     const prime = () => {
       v.currentTime = resumeAt
       const p = v.play()
@@ -88,6 +114,10 @@ export function MacawFlight() {
     v.addEventListener('seeking', onSeeking)
     v.addEventListener('seeked', onSeeked)
     return () => {
+      cancelled = true
+      if (blobUrl) URL.revokeObjectURL(blobUrl)
+      v.removeEventListener('loadedmetadata', ensureSeekable)
+      v.removeEventListener('error', onError)
       v.removeEventListener('loadeddata', prime)
       v.removeEventListener('seeking', onSeeking)
       v.removeEventListener('seeked', onSeeked)
