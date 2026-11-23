@@ -1,0 +1,3 @@
+# Private demo — keep out of search engines until approved by the restaurant.
+User-agent: *
+Disallow: /
