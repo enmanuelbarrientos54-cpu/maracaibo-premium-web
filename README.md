@@ -18,16 +18,18 @@ Parámetros útiles: `?intro=skip` (entra directo a la web) · `?intro=play` (fu
 
 ## Introducción cinematográfica
 
-`src/components/CinematicIntro.tsx` — usa el video **original** de Higgsfield (`spliced.mp4`, 1920×1080, H.264 High@4.0, 24 fps, ≈8,5 Mbps).
+`src/components/CinematicIntro.tsx` — usa el video de Higgsfield en su **versión 4K** (`media/original/intro-4k-master.mp4`, 3840×2160, H.264, 30 fps, ≈21 Mbps). Todas las versiones web se obtienen **reduciendo** ese master: detalle real, sin ampliar ni enfocar artificialmente.
 
 | Archivo | Qué es | Cuándo se usa |
 | --- | --- | --- |
-| `public/video/intro-hd.mp4` | El master de Higgsfield 1920×1080 con **realce de nitidez** (CAS + unsharp). El master pierde detalle desde las escaleras (~6 s); el realce recupera la definición de bordes sin generar contenido nuevo. 2 pasadas, ~11,5 Mbps, 22 MB | Escritorio, portátiles, Full HD / 2K / 4K, móviles y tabletas en horizontal |
-| `public/video/intro-portrait.mp4` | Recorte central 608×1080 del master, escalado con Lanczos a 1080×1920 y con el mismo realce. ~5,5 Mbps, 10,5 MB | Pantallas táctiles en vertical |
+| `public/video/intro-1440.mp4` | 2560×1440 desde el 4K, 2 pasadas ~12 Mbps, 22,7 MB | Pantallas 2K / 4K / Retina de escritorio |
+| `public/video/intro-1080.mp4` | 1920×1080 desde el 4K, 2 pasadas ~9 Mbps, 17 MB | Full HD, portátiles, móviles y tabletas en horizontal |
+| `public/video/intro-portrait.mp4` | Recorte central 9:16 del 4K reducido a 1080×1920, ~6 Mbps, 11,4 MB | Pantallas táctiles en vertical |
 | `public/video/intro-720.mp4` | Versión 720p ligera | Sólo con «Ahorro de datos» o red 2G |
-| `media/original/intro-original.mp4` | **Master original sin recodificar** (flujo de video idéntico, MD5 verificado). No se publica en la web | Referencia / futuras conversiones |
+| `media/original/intro-4k-master.mp4` | Master 4K tal como se entregó (no se publica en la web) | Referencia / futuras conversiones |
+| `media/original/intro-original.mp4` | Primera versión 1080p del video (no se publica) | Referencia |
 
-Nitidez medida (varianza laplaciana) en el tramo de las escaleras, segundo 7: original 55 → versión HD 133; en la recepción (10 s): 27 → 77.
+Nitidez medida (varianza laplaciana, 1080p) frente a la primera versión del video: escaleras (7 s) 55 → 220; vestíbulo (10 s) 27 → 91; recepción (13 s) 38 → 84.
 
 La selección se hace por **tipo de dispositivo**, no por el tamaño de la ventana: una ventana estrecha en un ordenador recibe igualmente el original. 1080p es la resolución nativa del master; en pantallas 2K/4K el navegador lo escala sin inventar detalle. El video no lleva filtros, desenfoques ni transformaciones (tampoco durante la transición final, que sólo oscurece la escena con un velo).
 
@@ -84,7 +86,7 @@ Esto sólo funciona con la web publicada en su propio dominio (p. ej. Cloudflare
 
 ### Cloudflare Pages (recomendado)
 
-El repositorio incluye `public/_headers` (caché y `noindex`), `wrangler.toml` y `.node-version` (Node 22). El archivo más grande es el video HD de la intro (22 MB), por debajo del límite de 25 MiB por archivo de Cloudflare Pages. Cloudflare sirve los videos con peticiones *Range*, necesarias para Safari/iOS.
+El repositorio incluye `public/_headers` (caché y `noindex`), `wrangler.toml` y `.node-version` (Node 22). El archivo más grande es la intro 1440p (22,7 MB), por debajo del límite de 25 MiB por archivo de Cloudflare Pages. Cloudflare sirve los videos con peticiones *Range*, necesarias para Safari/iOS.
 
 **Opción A — desde GitHub (panel de Cloudflare):** Workers & Pages → Create → Pages → Connect to Git → este repositorio y la rama `claude/brave-hamilton-1oc3xl` → Framework preset: *None* (o Vite) · Build command: `npm run build` · Build output directory: `dist`.
 

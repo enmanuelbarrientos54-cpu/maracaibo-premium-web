@@ -27,14 +27,13 @@ type NetInfo = { saveData?: boolean; effectiveType?: string }
 /**
  * Source selection is based on the DEVICE, never on the window size, so a
  * narrow or tall browser window on a desktop still gets the full film.
+ * Every file is downscaled from the 4K (3840×2160) Higgsfield master — real
+ * detail, no upscaling or artificial sharpening.
  *
- * - Default (desktop, laptop, Full HD / 2K / 4K, landscape phones & tablets):
- *   the Higgsfield master at 1920×1080 with edge enhancement (CAS + unsharp).
- *   The master itself softens from the stairs onward (~6 s); the enhancement
- *   restores edge definition without generating new content. The untouched
- *   master is kept in media/original/.
- * - Touch devices held upright: the 608×1080 centre crop, Lanczos-scaled to
- *   1080×1920 before the same enhancement, so phones do less upscaling.
+ * - 2K / 4K / Retina desktop screens: 2560×1440.
+ * - Full HD desktops, laptops, landscape phones & tablets: 1920×1080.
+ * - Touch devices held upright: native 9:16 centre crop of the 4K master,
+ *   scaled down to 1080×1920 (identical framing to object-fit: cover).
  * - Data Saver / 2G only: a 720p fallback.
  */
 function pickSource(): Source {
@@ -42,10 +41,12 @@ function pickSource(): Source {
   const dataSaver = !!conn?.saveData || /^(slow-)?2g$/.test(conn?.effectiveType ?? '')
   const touch = window.matchMedia('(pointer: coarse)').matches && !window.matchMedia('(any-pointer: fine)').matches
   const upright = window.matchMedia('(orientation: portrait)').matches
+  const screenPx = Math.max(window.screen.width, window.screen.height) * (window.devicePixelRatio || 1)
 
   if (dataSaver) return { src: '/video/intro-720.mp4', poster: '/video/intro-poster.jpg' }
   if (touch && upright) return { src: '/video/intro-portrait.mp4', poster: '/video/intro-poster-portrait.jpg' }
-  return { src: '/video/intro-hd.mp4', poster: '/video/intro-poster.jpg' }
+  if (!touch && screenPx >= 2200) return { src: '/video/intro-1440.mp4', poster: '/video/intro-poster.jpg' }
+  return { src: '/video/intro-1080.mp4', poster: '/video/intro-poster.jpg' }
 }
 
 /** Captions timed to the film's shots. */
@@ -211,10 +212,10 @@ export function CinematicIntro() {
           onEnded={() => runOutro(false)}
           onError={() => setPhase((p) => (p === 'outro' ? p : 'failed'))}
         >
-          {/* H.264 High@4.0 — plays in every current browser (Chrome, Edge, Safari, Firefox). */}
+          {/* H.264 High profile — plays in every current browser (Chrome, Edge, Safari, Firefox). */}
           <source
             src={source.src}
-            type='video/mp4; codecs="avc1.640028"'
+            type="video/mp4"
             onError={() => setPhase((p) => (p === 'outro' ? p : 'failed'))}
           />
         </video>
