@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Reveal } from '../components/Reveal'
+import { useRef, useState } from 'react'
+import { Reveal, useSectionOpen } from '../components/Reveal'
 import { SplitWords } from '../components/SplitWords'
 import { ParallaxImage } from '../components/ParallaxImage'
 import { Eyebrow, LinkButton, StatusTag } from '../components/ui'
@@ -13,9 +13,11 @@ const occasions = [
 ]
 
 export function PrivateEvents() {
+  const sectionRef = useRef<HTMLElement>(null)
+  useSectionOpen(sectionRef)
   const { t } = useLang()
   return (
-    <section id="events" aria-labelledby="events-title" className="relative overflow-hidden bg-jungle py-24 md:py-36">
+    <section ref={sectionRef} id="events" aria-labelledby="events-title" className="relative overflow-hidden bg-jungle py-24 md:py-36">
       <div className="pointer-events-none absolute -right-40 top-20 h-[38rem] w-[38rem] rounded-full bg-fern/25 blur-[120px]" />
       <div className="container-x relative">
         <div className="grid gap-14 lg:grid-cols-12">

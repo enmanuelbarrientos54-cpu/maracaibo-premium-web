@@ -1,5 +1,5 @@
-import { useRef } from 'react'
-import { gsap, ScrollTrigger } from '../lib/gsap'
+import { useRef, useState } from 'react'
+import { gsap, ScrollTrigger, prefersReducedMotion } from '../lib/gsap'
 import { ease, mix } from '../lib/motion'
 import { useGsap } from '../hooks/useGsap'
 import { Eyebrow } from '../components/ui'
@@ -60,8 +60,11 @@ const panels: Panel[] = [
 export function Experience() {
   const { t } = useLang()
   const ref = useRef<HTMLElement>(null)
+  // reduced motion: no pinned 3D carousel; the static swipe gallery is used at every size
+  const [still] = useState(prefersReducedMotion)
 
   useGsap(ref, ({ reduced, q }) => {
+    if (reduced) return
     const mm = gsap.matchMedia()
     mm.add('(min-width: 1024px)', () => {
       const stage = q('.cf-stage')[0] as HTMLElement
@@ -120,7 +123,7 @@ export function Experience() {
   return (
     <section ref={ref} id="experience" aria-labelledby="exp-title" className="relative bg-ink">
       {/* Desktop: pinned 3D coverflow */}
-      <div className="cf-stage relative hidden h-[100svh] overflow-hidden [perspective:1600px] lg:block">
+      <div className={`cf-stage relative hidden h-[100svh] overflow-hidden [perspective:1600px] ${still ? '' : 'lg:block'}`}>
         <div className="cf-heading container-x absolute inset-y-0 left-0 z-[60] flex max-w-[40rem] flex-col justify-center">
           <Reveal start="top 80%">
             <Eyebrow index="03">{t('The Experience')}</Eyebrow>
@@ -161,7 +164,7 @@ export function Experience() {
       </div>
 
       {/* Phones & tablets: native swipe carousel */}
-      <div className="py-24 lg:hidden">
+      <div className={`py-24 ${still ? '' : 'lg:hidden'}`}>
         <Reveal className="container-x" start="top 80%">
           <Eyebrow index="03">{t('The Experience')}</Eyebrow>
           <SplitWords className="display-lg mt-8 text-ivory" lines={[t('Step'), { text: t('inside.'), accent: true }]} />

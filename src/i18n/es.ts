@@ -1,5 +1,10 @@
 /** Spanish translations, keyed by the English source text used in t(). */
 export const es: Record<string, string> = {
+  "Film: a blue-and-yellow macaw flies over the Maracaibo bridge, takes a cachapa and flies away into the sunset.": "Película: una guacamaya azul y amarilla sobrevuela el puente de Maracaibo, toma una cachapa y se aleja volando hacia el atardecer.",
+  "Lake Maracaibo, Venezuela": "Lago de Maracaibo, Venezuela",
+  "From the Maracaibo Bridge": "Del Puente de Maracaibo",
+  "to your table.": "a tu mesa.",
+  "Scroll to fly": "Desliza para volar",
   "Exit full screen": "Salir de pantalla completa",
   "Full screen": "Pantalla completa",
   "& careers.": "y empleo.",

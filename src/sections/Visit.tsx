@@ -9,8 +9,19 @@ export function Visit() {
   const { t } = useLang()
   const [mapOn, setMapOn] = useState(false)
   return (
-    <section id="visit" aria-labelledby="visit-title" className="relative bg-ink py-24 md:py-36">
-      <div className="container-x grid gap-14 lg:grid-cols-12">
+    <section id="visit" aria-labelledby="visit-title" className="relative overflow-hidden bg-ink py-24 md:py-36">
+      {/* warm light, like the brass lanterns at the reception */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-[20%] -top-[10%] h-[70%] w-[80%] opacity-90"
+        style={{ background: 'radial-gradient(closest-side, rgba(201,167,106,0.16), rgba(201,167,106,0.05) 55%, transparent)' }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-[20%] right-[-10%] h-[60%] w-[60%]"
+        style={{ background: 'radial-gradient(closest-side, rgba(107,38,38,0.22), transparent)' }}
+      />
+      <div className="container-x relative grid gap-14 lg:grid-cols-12">
         <Reveal className="lg:col-span-5">
           <Eyebrow index="08">{t('Visit')}</Eyebrow>
           <SplitWords id="visit-title" className="display-lg mt-8 text-ivory" lines={[t('Find us on'), { text: 'Kennedy Blvd.', accent: true }]} />
@@ -54,7 +65,10 @@ export function Visit() {
           </dl>
 
           <div data-fade className="mt-10 flex flex-wrap gap-3">
-            <LinkButton href={links.directions} external>
+            <LinkButton href={links.openTable} external className="btn-glow">
+              {t('Reserve a Table')}
+            </LinkButton>
+            <LinkButton href={links.directions} external variant="ghost">
               {t('Get Directions')}
             </LinkButton>
             <a href={restaurant.phone.href} className="btn btn-ghost">

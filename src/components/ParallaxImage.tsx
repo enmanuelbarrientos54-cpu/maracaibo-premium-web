@@ -45,6 +45,12 @@ export function ParallaxImage({
         scrollTrigger: { trigger: ref.current, start: 'top bottom', end: 'bottom top', scrub: true },
       },
     )
+    // slow cinematic settle of the photo while it is unmasked
+    gsap.fromTo(
+      q('.pi-zoom'),
+      { scale: 1.14 },
+      { scale: 1, duration: 2.4, ease: 'expo.out', scrollTrigger: { trigger: ref.current, start: 'top 88%', once: true } },
+    )
     if (mask) {
       gsap.fromTo(
         ref.current,
@@ -60,6 +66,7 @@ export function ParallaxImage({
   })
   return (
     <figure ref={ref} className={`${/\b(absolute|fixed)\b/.test(className) ? '' : 'relative'} overflow-hidden ${className}`}>
+      <div className="pi-zoom h-full w-full will-change-transform">
       <img
         src={src}
         srcSet={srcSet}
@@ -69,6 +76,7 @@ export function ParallaxImage({
         decoding="async"
         className={`h-full w-full object-cover will-change-transform ${imgClassName}`}
       />
+      </div>
       {caption && (
         <figcaption className="absolute bottom-3 left-3 rounded-full bg-ink/55 px-3 py-1 text-[0.6rem] uppercase tracking-[0.2em] text-ivory/80 backdrop-blur">
           {caption}

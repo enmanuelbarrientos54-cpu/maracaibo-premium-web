@@ -27,7 +27,7 @@ const CAPTIONS = [
   { at: 8.6, text: 'Welcome' },
 ]
 
-const OUTRO_LEAD = 1.15 // seconds before the end the outro begins
+const OUTRO_LEAD = 0.9 // the title begins as the camera settles; the film still plays to its last frame
 const BRAND = 'MARACAIBO'.split('')
 
 export function CinematicIntro() {
@@ -52,32 +52,31 @@ export function CinematicIntro() {
       const tl = gsap.timeline({ defaults: { ease: 'expo.out' } })
       const v = video.current
 
-      tl.to(q('.intro-chrome'), { autoAlpha: 0, duration: 0.4, ease: 'power2.out' }, 0)
-        // the film settles into darkness so the wordmark never competes with the sign on screen.
-        // No blur or scale on the video: it stays pixel-sharp to the last frame.
-        .to(q('.intro-veil'), { opacity: 0.88, duration: fast ? 0.45 : 1.1, ease: 'power2.inOut' }, 0)
+      // The film plays to its final frame and HOLDS it (no black screen). The title
+      // card sets in over the lower third, then the held frame dissolves into the
+      // real photograph of the same reception in the hero.
+      tl.to(q('.intro-chrome'), { autoAlpha: 0, duration: 0.5, ease: 'power2.out' }, 0)
+        .to(q('.intro-shade'), { opacity: 1, duration: fast ? 0.6 : 1.4, ease: 'power2.inOut' }, 0)
+        .to(q('.intro-veil'), { opacity: 0.12, duration: fast ? 0.6 : 1.4, ease: 'power2.inOut' }, 0)
         .fromTo(
           q('.intro-letter'),
           // y: 0 resets the offset GSAP reads from the CSS pre-hide, so only yPercent moves
-          { y: 0, yPercent: 115, rotate: 4 },
-          { y: 0, yPercent: 0, rotate: 0, duration: fast ? 0.8 : 1.25, stagger: fast ? 0.035 : 0.065 },
-          fast ? 0.1 : 0.35,
+          { y: 0, yPercent: 70, autoAlpha: 0, filter: 'blur(10px)' },
+          { y: 0, yPercent: 0, autoAlpha: 1, filter: 'blur(0px)', duration: fast ? 0.9 : 1.6, stagger: fast ? 0.03 : 0.07, ease: 'power3.out' },
+          fast ? 0.1 : 0.25,
         )
-        .fromTo(q('.intro-rule'), { scaleX: 0 }, { scaleX: 1, duration: fast ? 0.7 : 1.2, ease: 'expo.inOut' }, '<0.25')
-        .fromTo(q('.intro-sub'), { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.12 }, '<0.2')
-        // hold on the wordmark, then pull the curtain up to reveal the homepage
-        .addLabel('wipe', fast ? 0.55 : '+=0.55')
+        .fromTo(q('.intro-word'), { letterSpacing: '0.34em' }, { letterSpacing: '0.1em', duration: fast ? 1.2 : 2.4, ease: 'expo.out' }, '<')
+        .fromTo(q('.intro-rule'), { scaleX: 0 }, { scaleX: 1, duration: fast ? 0.7 : 1.2, ease: 'expo.inOut' }, '<0.5')
+        .fromTo(q('.intro-sub'), { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.12 }, '<0.2')
+        // hold the last frame with the title, then dissolve into the homepage
+        // skipping: the title only glimpses through and the page arrives quickly
+        .addLabel('dissolve', fast ? 0.45 : '+=0.9')
         .add(() => {
           v?.pause()
           reveal()
-        }, 'wipe')
-        .to(q('.intro-brand'), { yPercent: -35, autoAlpha: 0, duration: 1.1, ease: 'expo.in' }, 'wipe-=0.15')
-        .fromTo(
-          root.current,
-          { clipPath: 'inset(0% 0% 0% 0%)' },
-          { clipPath: 'inset(0% 0% 100% 0%)', duration: fast ? 1.05 : 1.35, ease: 'expo.inOut' },
-          'wipe',
-        )
+        }, 'dissolve')
+        .to(q('.intro-brand'), { y: -24, autoAlpha: 0, duration: fast ? 0.8 : 1.2, ease: 'power2.in' }, 'dissolve')
+        .to(root.current, { autoAlpha: 0, duration: fast ? 0.85 : 1.6, ease: 'power2.inOut' }, fast ? 'dissolve' : 'dissolve+=0.1')
         .add(() => finish())
     },
     [finish, reveal],
@@ -235,6 +234,11 @@ export function CinematicIntro() {
         }}
       />
       <div className="intro-veil pointer-events-none absolute inset-0 bg-ink opacity-0" />
+      {/* lower-third shade for the title card: the held last frame stays visible above it */}
+      <div
+        className="intro-shade pointer-events-none absolute inset-0 opacity-0"
+        style={{ background: 'linear-gradient(0deg, rgba(10,8,6,0.88) 0%, rgba(10,8,6,0.55) 26%, rgba(10,8,6,0) 58%)' }}
+      />
 
       {/* Chrome: wordmark, skip, captions, progress */}
       <div className="intro-chrome absolute inset-0">
@@ -284,12 +288,11 @@ export function CinematicIntro() {
       </div>
 
       {/* Brand reveal */}
-      <div className="intro-brand pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-        <p className="intro-sub eyebrow mb-6 text-brass opacity-0">{t('Union City · New Jersey')}</p>
-        <h2 className="flex overflow-hidden font-display text-[clamp(2.6rem,11vw,9.5rem)] font-light leading-none tracking-[0.06em]" aria-label="Maracaibo">
+      <div className="intro-brand pointer-events-none absolute inset-0 flex flex-col items-center justify-end px-4 pb-[max(11svh,env(safe-area-inset-bottom))] text-center md:pb-[10vh]">
+        <h2 className="intro-word flex font-display text-[clamp(2.4rem,10.5vw,8.5rem)] font-light leading-none tracking-[0.1em] [text-shadow:0_2px_30px_rgba(0,0,0,0.45)]" aria-label="Maracaibo">
           {BRAND.map((l, i) => (
-            <span key={i} className="inline-block overflow-hidden pb-[0.06em]" aria-hidden>
-              <span className="intro-letter inline-block translate-y-[115%]">{l}</span>
+            <span key={i} className="inline-block pb-[0.06em]" aria-hidden>
+              <span className="intro-letter inline-block opacity-0">{l}</span>
             </span>
           ))}
         </h2>
@@ -297,6 +300,7 @@ export function CinematicIntro() {
         <p className="intro-sub mt-6 font-display text-lg italic text-cream/90 opacity-0 md:text-2xl">
           {t('Venezuelan & Caribbean cuisine')}
         </p>
+        <p className="intro-sub eyebrow mt-5 text-brass opacity-0">{t('Union City · New Jersey')}</p>
       </div>
     </div>
   )

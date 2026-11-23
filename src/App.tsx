@@ -19,6 +19,7 @@ import { Visit } from './sections/Visit'
 import { Manifesto } from './sections/Manifesto'
 import { FlavorOrbit } from './sections/FlavorOrbit'
 import { Stamp } from './sections/Stamp'
+import { MacawFlight } from './sections/MacawFlight'
 import { restaurant } from './data/restaurant'
 import { initSmoothScroll, scrollToTarget } from './lib/smoothScroll'
 import { ScrollTrigger } from './lib/gsap'
@@ -87,6 +88,7 @@ function Site() {
         <Catering />
         <Services />
         <Stamp />
+        <MacawFlight />
         <Visit />
       </main>
       <Footer />

@@ -55,6 +55,25 @@ La selección se hace por **tipo de dispositivo**, no por el tamaño de la venta
 
 Comportamiento: autoplay · muted · playsInline · sin controles · sin bucle · «Skip intro» (y tecla Esc) · se recuerda en `sessionStorage` · respeta `prefers-reduced-motion` · si el navegador bloquea el autoplay aparece «Play the film» · si el video falla se muestra el póster y continúa la transición. La intro se identifica como «Concept film · AI-rendered».
 
+## La guacamaya (sorpresa final)
+
+`src/sections/MacawFlight.tsx` + `src/data/macawMedia.ts` — video de Higgsfield (guacamaya azul y amarilla sobre el Puente de Maracaibo que toma una cachapa y se aleja). Va justo antes de «Visítanos».
+
+- **Controlado por scroll:** la sección se fija a pantalla completa (`100svh`/`100lvh`, `object-fit: cover`) y el scroll marca el segundo de la película, con suavizado. Al subir retrocede; nunca hace bucle. Al final se conserva el último fotograma y se funde con la sección siguiente.
+- **Respaldo automático:** si el dispositivo tarda en saltar dentro del video (media > 220 ms), pasa a reproducirse una vez en tiempo real mientras la sección está en pantalla. `macawMedia.mode = 'autoplay'` lo fuerza siempre.
+- **Movimiento reducido:** imagen fija del momento clave (la guacamaya sobre la cachapa), sin fijar la sección.
+- **Carga diferida:** el video sólo se descarga al acercarse a la sección. Silencioso e *inline* en móviles (`muted`, `playsinline`, `webkit-playsinline`).
+
+| Archivo | Qué es |
+| --- | --- |
+| `public/video/macaw-1080.mp4` | 1920×1080 H.264 8 bits desde el master HEVC 10 bits; fotograma clave cada 6 cuadros y sin fotogramas B para saltos instantáneos. 14,8 MB, SSIM 0,990 |
+| `public/video/macaw-portrait.mp4` | **Vertical**: el original reencuadrado a 9:16 siguiendo a la guacamaya y la cachapa (con el puente al inicio y al final), 1080×1920, 11 MB |
+| `public/video/macaw-poster*.jpg`, `macaw-end*.jpg`, `macaw-still*.jpg` | Primer fotograma, último fotograma y fotograma clave |
+| `media/original/macaw-master.mp4` | Master original (HEVC 10 bits) sin tocar |
+| `media/original/macaw-portrait-crop-x.txt` | Expresión del reencuadre vertical |
+
+Límite conocido: el video es horizontal; en un teléfono vertical a pantalla completa sólo cabe ~⅓ del ancho, así que las puntas de las alas pueden salirse un instante cuando están totalmente abiertas. La solución ideal es un render vertical 9:16 desde Higgsfield: basta con reemplazar `macaw-portrait.mp4` (y sus imágenes) y poner `kind: 'native'`.
+
 ## Contenido y fuentes
 
 Toda la información visible procede de páginas oficiales de `maracaibonj.com` (o su ficha oficial de OpenTable), verificada el 2026-11-23:

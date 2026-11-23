@@ -1,4 +1,5 @@
-import { Reveal } from '../components/Reveal'
+import { useRef } from 'react'
+import { Reveal, useSectionOpen } from '../components/Reveal'
 import { SplitWords } from '../components/SplitWords'
 import { ParallaxImage } from '../components/ParallaxImage'
 import { Eyebrow, LinkButton } from '../components/ui'
@@ -7,10 +8,12 @@ import { todaysHours } from '../lib/hours'
 import { useLang } from '../i18n/LangContext'
 
 export function Reservations() {
+  const sectionRef = useRef<HTMLElement>(null)
+  useSectionOpen(sectionRef)
   const { t } = useLang()
   const today = todaysHours()
   return (
-    <section id="reserve" aria-labelledby="reserve-title" className="relative overflow-hidden bg-cream text-ink">
+    <section ref={sectionRef} id="reserve" aria-labelledby="reserve-title" className="relative overflow-hidden bg-cream text-ink">
       <div className="grid lg:min-h-[100svh] lg:grid-cols-2">
         <ParallaxImage
           src="/images/dining-room-bar.webp"

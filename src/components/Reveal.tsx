@@ -47,3 +47,22 @@ export function Reveal({
     </Tag>
   )
 }
+
+/**
+ * Scrubbed entrance for full-width colour sections: the section opens from a
+ * slightly inset, rounded card to full bleed as it scrolls into view.
+ */
+export function useSectionOpen(ref: React.RefObject<HTMLElement | null>) {
+  useGsap(ref, ({ reduced }) => {
+    if (reduced) return
+    gsap.fromTo(
+      ref.current,
+      { clipPath: 'inset(4% 3% 0% 3% round 28px)' },
+      {
+        clipPath: 'inset(0% 0% 0% 0% round 0px)',
+        ease: 'none',
+        scrollTrigger: { trigger: ref.current, start: 'top 98%', end: 'top 35%', scrub: 0.6 },
+      },
+    )
+  })
+}

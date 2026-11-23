@@ -202,6 +202,21 @@ html.lenis body {
   .btn-dark:focus-visible {
     color: var(--color-ink);
   }
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+  .btn:active {
+    transform: translateY(0) scale(0.97);
+    transition-duration: 0.15s;
+  }
+  .btn-solid:hover,
+  .btn-solid:focus-visible {
+    box-shadow: 0 14px 34px -14px color-mix(in oklab, var(--color-brass) 75%, transparent);
+  }
+  /* slow, discreet breathing glow for the main reservation call to action */
+  .btn-glow {
+    animation: btn-glow 3.6s ease-in-out infinite;
+  }
   .btn .btn-arrow {
     transition: transform 0.6s var(--ease-soft);
   }
@@ -296,4 +311,15 @@ html.lenis body {
 }
 .intro-caption {
   animation: caption-in 0.9s var(--ease-soft) both;
+}
+
+@keyframes btn-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-brass) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 7px color-mix(in oklab, var(--color-brass) 18%, transparent),
+      0 16px 40px -16px color-mix(in oklab, var(--color-brass) 70%, transparent);
+  }
 }
