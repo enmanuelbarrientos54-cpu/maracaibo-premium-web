@@ -24,12 +24,32 @@ Parámetros útiles: `?intro=skip` (entra directo a la web) · `?intro=play` (fu
 | --- | --- | --- |
 | `public/video/intro-1440.mp4` | 2560×1440 desde el 4K, 2 pasadas ~12 Mbps, 22,7 MB | Pantallas 2K / 4K / Retina de escritorio |
 | `public/video/intro-1080.mp4` | 1920×1080 desde el 4K, 2 pasadas ~9 Mbps, 17 MB | Full HD, portátiles, móviles y tabletas en horizontal |
-| `public/video/intro-portrait.mp4` | Recorte central 9:16 del 4K reducido a 1080×1920, ~6 Mbps, 11,4 MB | Pantallas táctiles en vertical |
+| `public/video/intro-portrait.mp4` | **Video vertical**: el original reencuadrado para 9:16 desde el 4K (cámara virtual que sigue la acción), 1080×1920, ~6,5 Mbps, 12,3 MB | Pantallas táctiles en vertical |
+| `public/video/intro-portrait-lite.mp4` | Video vertical ligero 720×1280 | Móvil en vertical con «Ahorro de datos» o 2G |
 | `public/video/intro-720.mp4` | Versión 720p ligera | Sólo con «Ahorro de datos» o red 2G |
 | `media/original/intro-4k-master.mp4` | Master 4K tal como se entregó (no se publica en la web) | Referencia / futuras conversiones |
 | `media/original/intro-original.mp4` | Primera versión 1080p del video (no se publica) | Referencia |
 
 Nitidez medida (varianza laplaciana, 1080p) frente a la primera versión del video: escaleras (7 s) 55 → 220; vestíbulo (10 s) 27 → 91; recepción (13 s) 38 → 84.
+
+### Dos videos independientes (horizontal y vertical)
+
+La configuración está en `src/data/introMedia.ts`: `landscape` (PC y dispositivos en horizontal) y `portrait` (móviles y tabletas en vertical). Hoy el vertical es el **video original reencuadrado**; cuando exista un video vertical propio:
+
+1. Exportarlo a 1080×1920 (H.264, 6–8 Mbps, sin audio, *fast start*).
+2. Reemplazar `public/video/intro-portrait.mp4` (y su póster), o cambiar `portrait.hd.src` y poner `kind: 'native'`.
+
+No hace falta tocar más código. Si el usuario gira el teléfono durante la película, se cambia al video adecuado en el mismo segundo.
+
+### Encuadre móvil
+
+El recorte vertical no es fijo: sigue al protagonista de cada plano (la fachada y la «M», la entrada y las escaleras, el arco con el mapa de Venezuela, el letrero de la recepción) mediante fotogramas clave con transiciones suaves; en el corte de escena (12,3 s) cambia de golpe, como un corte de montaje. La expresión exacta del recorte está en `media/original/portrait-reframe-crop-x.txt` y se aplicó así:
+
+```bash
+ffmpeg -i media/original/intro-4k-master.mp4 -vf "crop=1215:2160:'$(cat media/original/portrait-reframe-crop-x.txt)':0,scale=1080:1920:flags=lanczos" -an -c:v libx264 -preset slower -tune film -b:v 6500k -movflags +faststart public/video/intro-portrait.mp4
+```
+
+La intro ocupa toda la pantalla visible en móviles (`100svh`, ancho completo, `object-fit: cover`, `muted` + `autoplay` + `playsinline`/`webkit-playsinline`). La portada mide exactamente `100svh` en móvil, con tipografía y botones adaptados a pantallas verticales (incluidas pantallas bajas como el iPhone SE).
 
 La selección se hace por **tipo de dispositivo**, no por el tamaño de la ventana: una ventana estrecha en un ordenador recibe igualmente el original. 1080p es la resolución nativa del master; en pantallas 2K/4K el navegador lo escala sin inventar detalle. El video no lleva filtros, desenfoques ni transformaciones (tampoco durante la transición final, que sólo oscurece la escena con un velo).
 

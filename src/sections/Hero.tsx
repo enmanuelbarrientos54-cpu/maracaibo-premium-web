@@ -61,7 +61,7 @@ export function Hero() {
       ref={ref}
       id="top"
       aria-label="Welcome"
-      className="relative isolate flex min-h-[100svh] flex-col justify-end overflow-hidden"
+      className="relative isolate flex h-[100svh] min-h-[33rem] flex-col justify-end overflow-hidden md:h-auto md:min-h-[100svh]"
     >
       <div className="hero-media absolute inset-0 -z-10 will-change-transform">
         <picture>
@@ -72,7 +72,8 @@ export function Hero() {
             sizes="100vw"
             alt={t("Maracaibo's reception: the backlit MARACAIBO sign above a brass-lattice host stand flanked by gold lanterns.")}
             {...{ fetchpriority: 'high' }}
-            className="hero-img h-full w-full object-cover object-[62%_30%] will-change-transform md:object-[50%_35%]"
+            className="hero-img h-full w-full object-cover object-[var(--hero-focus-m)] will-change-transform md:object-[50%_35%]"
+            style={{ ['--hero-focus-m' as string]: '24% 40%' }}
           />
         </picture>
       </div>
@@ -86,30 +87,30 @@ export function Hero() {
       />
       <div className="grain absolute inset-0 -z-10" />
 
-      <div className="hero-copy container-x relative pb-24 pt-32 md:pb-16">
-        <p data-hero-fade className="eyebrow mb-6 flex items-center gap-4 text-ivory/90 [text-shadow:0_1px_12px_rgba(0,0,0,0.6)] md:mb-8">
-          <span className="inline-block h-px w-10 bg-brass/70" />
+      <div className="hero-copy container-x relative pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-24 md:pb-16 md:pt-32">
+        <p data-hero-fade className="eyebrow mb-4 flex items-center gap-3 !text-[0.58rem] !tracking-[0.24em] text-ivory/90 [text-shadow:0_1px_12px_rgba(0,0,0,0.6)] md:mb-8 md:gap-4 md:!text-[0.6875rem] md:!tracking-[0.32em]">
+          <span className="inline-block h-px w-6 shrink-0 bg-brass/70 md:w-10" />
           {t(restaurant.tagline)} · Union City, NJ
         </p>
 
         <SplitWords
           as="h1"
-          className="display-xl max-w-[14ch] text-ivory"
+          className="display-xl max-w-[14ch] text-ivory max-md:!text-[clamp(2.5rem,11.5vw,3.6rem)] max-md:[@media(max-height:700px)]:!text-[clamp(2.2rem,10vw,2.9rem)]"
           lines={[t('Venezuelan soul,'), { text: t('Caribbean light.'), accent: true }]}
         />
 
-        <div className="mt-8 grid gap-8 md:mt-12 md:grid-cols-12 md:items-end">
-          <p data-hero-fade className="max-w-md text-[0.98rem] leading-relaxed text-cream/85 md:col-span-5 md:text-base">
+        <div className="mt-5 grid gap-5 md:mt-12 md:grid-cols-12 md:items-end md:gap-8">
+          <p data-hero-fade className="max-w-md text-[0.9rem] leading-snug text-cream/85 max-md:line-clamp-3 max-md:[@media(max-height:640px)]:hidden md:col-span-5 md:text-base md:leading-relaxed">
             {t(restaurant.concept)}
           </p>
-          <div data-hero-fade className="flex flex-wrap gap-3 md:col-span-7 md:justify-end">
+          <div data-hero-fade className="grid grid-cols-2 gap-2.5 md:col-span-7 md:flex md:flex-wrap md:justify-end md:gap-3">
             <a
               href="#menu"
               onClick={(e) => {
                 e.preventDefault()
                 scrollToTarget('#menu')
               }}
-              className="btn btn-solid"
+              className="btn btn-solid col-span-2 w-full md:w-auto"
             >
               <span>{t('Explore Menu')}</span>
               <span aria-hidden className="btn-arrow">
@@ -122,14 +123,19 @@ export function Hero() {
                 e.preventDefault()
                 scrollToTarget('#reserve')
               }}
-              className="btn btn-ghost"
+              className="btn btn-ghost w-full !gap-2 !px-3 !text-[0.62rem] !tracking-[0.14em] md:w-auto md:!gap-3 md:!px-[1.6rem] md:!text-[0.72rem] md:!tracking-[0.2em]"
             >
               <span>{t('Reserve a Table')}</span>
               <span aria-hidden className="btn-arrow">
                 →
               </span>
             </a>
-            <LinkButton href={links.order} external variant="ghost">
+            <LinkButton
+              href={links.order}
+              external
+              variant="ghost"
+              className="w-full !gap-2 !px-3 !text-[0.62rem] !tracking-[0.14em] md:w-auto md:!gap-3 md:!px-[1.6rem] md:!text-[0.72rem] md:!tracking-[0.2em]"
+            >
               {t('Order Online')}
             </LinkButton>
           </div>
@@ -137,9 +143,9 @@ export function Hero() {
 
         <div
           data-hero-fade
-          className="mt-12 flex flex-col gap-3 border-t border-ivory/10 pt-5 text-[0.7rem] uppercase tracking-[0.2em] text-sand sm:flex-row sm:items-center sm:justify-between"
+          className="mt-5 flex flex-col gap-3 border-t border-ivory/10 pt-4 text-[0.62rem] uppercase tracking-[0.2em] text-sand sm:flex-row sm:items-center sm:justify-between md:mt-12 md:pt-5 md:text-[0.7rem]"
         >
-          <span>{restaurant.address.full}</span>
+          <span className="hidden md:inline">{restaurant.address.full}</span>
           <span className="flex items-center gap-3">
             <span className="h-1.5 w-1.5 rounded-full bg-brass" />
             {t('Today')} · {t(today.time)}

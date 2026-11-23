@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from '../lib/gsap'
 import { useIntro } from '../context/IntroContext'
 import { startScroll, stopScroll } from '../lib/smoothScroll'
 import { useLang } from '../i18n/LangContext'
 import { LangToggle } from './LangToggle'
+import { pickIntroVariant, type IntroVariant } from '../data/introMedia'
 
 /**
  * Full-screen cinematic introduction.
@@ -17,37 +18,7 @@ import { LangToggle } from './LangToggle'
 
 type Phase = 'loading' | 'playing' | 'blocked' | 'failed' | 'outro'
 
-interface Source {
-  src: string
-  poster: string
-}
-
-type NetInfo = { saveData?: boolean; effectiveType?: string }
-
-/**
- * Source selection is based on the DEVICE, never on the window size, so a
- * narrow or tall browser window on a desktop still gets the full film.
- * Every file is downscaled from the 4K (3840×2160) Higgsfield master — real
- * detail, no upscaling or artificial sharpening.
- *
- * - 2K / 4K / Retina desktop screens: 2560×1440.
- * - Full HD desktops, laptops, landscape phones & tablets: 1920×1080.
- * - Touch devices held upright: native 9:16 centre crop of the 4K master,
- *   scaled down to 1080×1920 (identical framing to object-fit: cover).
- * - Data Saver / 2G only: a 720p fallback.
- */
-function pickSource(): Source {
-  const conn = (navigator as Navigator & { connection?: NetInfo }).connection
-  const dataSaver = !!conn?.saveData || /^(slow-)?2g$/.test(conn?.effectiveType ?? '')
-  const touch = window.matchMedia('(pointer: coarse)').matches && !window.matchMedia('(any-pointer: fine)').matches
-  const upright = window.matchMedia('(orientation: portrait)').matches
-  const screenPx = Math.max(window.screen.width, window.screen.height) * (window.devicePixelRatio || 1)
-
-  if (dataSaver) return { src: '/video/intro-720.mp4', poster: '/video/intro-poster.jpg' }
-  if (touch && upright) return { src: '/video/intro-portrait.mp4', poster: '/video/intro-poster-portrait.jpg' }
-  if (!touch && screenPx >= 2200) return { src: '/video/intro-1440.mp4', poster: '/video/intro-poster.jpg' }
-  return { src: '/video/intro-1080.mp4', poster: '/video/intro-poster.jpg' }
-}
+type Source = IntroVariant
 
 /** Captions timed to the film's shots. */
 const CAPTIONS = [
@@ -68,7 +39,7 @@ export function CinematicIntro() {
   const outroStarted = useRef(false)
   const [phase, setPhase] = useState<Phase>('loading')
   const [caption, setCaption] = useState(0)
-  const source = useMemo(pickSource, [])
+  const [source, setSource] = useState<Source>(pickIntroVariant)
 
   /* ------------------------------------------------------------ outro */
   const runOutro = useCallback(
@@ -156,6 +127,40 @@ export function CinematicIntro() {
     }
   }, [skip])
 
+  // Rotating a phone mid-film swaps to the matching (vertical / horizontal) film at the same moment.
+  useEffect(() => {
+    const mq = window.matchMedia('(orientation: portrait)')
+    const onRotate = () => {
+      const next = pickIntroVariant()
+      setSource((cur) => (cur.src === next.src ? cur : next))
+    }
+    mq.addEventListener('change', onRotate)
+    return () => mq.removeEventListener('change', onRotate)
+  }, [])
+
+  const lastSrc = useRef(source.src)
+  useEffect(() => {
+    const v = video.current
+    if (!v || lastSrc.current === source.src || outroStarted.current) return
+    lastSrc.current = source.src
+    const t = v.currentTime
+    v.load()
+    const resume = () => {
+      v.currentTime = t
+      v.play().catch(() => undefined)
+    }
+    v.addEventListener('loadedmetadata', resume, { once: true })
+  }, [source.src])
+
+  // iOS needs the attributes (not only the properties) for inline muted autoplay.
+  useLayoutEffect(() => {
+    const v = video.current
+    if (!v) return
+    v.setAttribute('muted', '')
+    v.setAttribute('playsinline', '')
+    v.setAttribute('webkit-playsinline', '')
+  }, [])
+
   // When the film fails to load, hold the poster frame briefly and run the brand outro.
   useEffect(() => {
     if (phase !== 'failed') return
@@ -187,16 +192,16 @@ export function CinematicIntro() {
   return (
     <div
       ref={root}
-      className="fixed inset-0 z-[100] overflow-hidden bg-ink text-ivory"
+      className="fixed inset-0 z-[100] min-h-[100svh] w-full overflow-hidden bg-ink text-ivory"
       role="region"
       aria-label={t("Maracaibo introduction film")}
       data-intro-root
     >
       {/* Media */}
-      <div className="intro-media absolute inset-0 origin-[50%_60%]">
+      <div className="intro-media absolute inset-0 h-full min-h-[100svh] w-full">
         <video
           ref={video}
-          className="h-full w-full object-cover"
+          className="absolute inset-0 h-full min-h-[100svh] w-full object-cover object-center"
           poster={source.poster}
           muted
           autoPlay
