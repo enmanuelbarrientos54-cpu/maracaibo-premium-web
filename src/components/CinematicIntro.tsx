@@ -29,11 +29,12 @@ type NetInfo = { saveData?: boolean; effectiveType?: string }
  * narrow or tall browser window on a desktop still gets the full film.
  *
  * - Default (desktop, laptop, Full HD / 2K / 4K, landscape phones & tablets):
- *   the original Higgsfield master, 1920×1080, untouched video stream
- *   (only the silent audio track was removed). 1080p is the master's native
- *   resolution: larger screens are upscaled by the browser, nothing is faked.
- * - Touch devices held upright: a native-resolution 608×1080 centre crop of the
- *   same master (identical framing to object-fit: cover, no downscaling).
+ *   the Higgsfield master at 1920×1080 with edge enhancement (CAS + unsharp).
+ *   The master itself softens from the stairs onward (~6 s); the enhancement
+ *   restores edge definition without generating new content. The untouched
+ *   master is kept in media/original/.
+ * - Touch devices held upright: the 608×1080 centre crop, Lanczos-scaled to
+ *   1080×1920 before the same enhancement, so phones do less upscaling.
  * - Data Saver / 2G only: a 720p fallback.
  */
 function pickSource(): Source {
@@ -44,7 +45,7 @@ function pickSource(): Source {
 
   if (dataSaver) return { src: '/video/intro-720.mp4', poster: '/video/intro-poster.jpg' }
   if (touch && upright) return { src: '/video/intro-portrait.mp4', poster: '/video/intro-poster-portrait.jpg' }
-  return { src: '/video/intro-original.mp4', poster: '/video/intro-poster.jpg' }
+  return { src: '/video/intro-hd.mp4', poster: '/video/intro-poster.jpg' }
 }
 
 /** Captions timed to the film's shots. */

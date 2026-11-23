@@ -75,6 +75,7 @@ export function Header() {
     <>
       <header
         ref={ref}
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
         className={`fixed inset-x-0 top-0 z-50 transition-[background-color,backdrop-filter,border-color] duration-700 ${
           solid && !open ? 'border-b border-ivory/[0.06] bg-ink/70 backdrop-blur-xl' : 'border-b border-transparent'
         }`}

@@ -22,10 +22,12 @@ Parámetros útiles: `?intro=skip` (entra directo a la web) · `?intro=play` (fu
 
 | Archivo | Qué es | Cuándo se usa |
 | --- | --- | --- |
-| `public/video/intro-original.mp4` | **El master original sin recodificar** (flujo de video idéntico, MD5 verificado); sólo se quitó la pista de audio, ya que la intro es muda. 16,0 MB | Escritorio, portátiles, pantallas Full HD / 2K / 4K, móviles y tabletas en horizontal |
-| `public/video/intro-portrait.mp4` | Recorte central 608×1080 del original a **resolución nativa** (sin reescalar), x264 CRF 14 (SSIM 0,996 frente al original). 7,5 MB | Pantallas táctiles en vertical (móviles, tabletas) |
+| `public/video/intro-hd.mp4` | El master de Higgsfield 1920×1080 con **realce de nitidez** (CAS + unsharp). El master pierde detalle desde las escaleras (~6 s); el realce recupera la definición de bordes sin generar contenido nuevo. 2 pasadas, ~11,5 Mbps, 22 MB | Escritorio, portátiles, Full HD / 2K / 4K, móviles y tabletas en horizontal |
+| `public/video/intro-portrait.mp4` | Recorte central 608×1080 del master, escalado con Lanczos a 1080×1920 y con el mismo realce. ~5,5 Mbps, 10,5 MB | Pantallas táctiles en vertical |
 | `public/video/intro-720.mp4` | Versión 720p ligera | Sólo con «Ahorro de datos» o red 2G |
-| `public/video/intro-poster*.jpg` | Primer fotograma del original | Mientras carga el video |
+| `media/original/intro-original.mp4` | **Master original sin recodificar** (flujo de video idéntico, MD5 verificado). No se publica en la web | Referencia / futuras conversiones |
+
+Nitidez medida (varianza laplaciana) en el tramo de las escaleras, segundo 7: original 55 → versión HD 133; en la recepción (10 s): 27 → 77.
 
 La selección se hace por **tipo de dispositivo**, no por el tamaño de la ventana: una ventana estrecha en un ordenador recibe igualmente el original. 1080p es la resolución nativa del master; en pantallas 2K/4K el navegador lo escala sin inventar detalle. El video no lleva filtros, desenfoques ni transformaciones (tampoco durante la transición final, que sólo oscurece la escena con un velo).
 
@@ -71,9 +73,18 @@ Para completar el menú basta con añadir objetos a `menuItems` en `src/data/men
 
 ## Despliegue
 
-### Cloudflare Pages (recomendado para servir el video original)
+### Pantalla completa en el teléfono
 
-El repositorio incluye `public/_headers` (caché y `noindex`), `wrangler.toml` y `.node-version` (Node 22). El archivo más grande es el video original (16,0 MB), por debajo del límite de 25 MiB por archivo de Cloudflare Pages. Cloudflare sirve los videos con peticiones *Range*, necesarias para Safari/iOS.
+La web es instalable (`public/manifest.webmanifest`, iconos en `public/icons/`, metaetiquetas de Apple). Abierta desde la pantalla de inicio se ejecuta a pantalla completa, sin barras del navegador:
+
+- **iPhone (Safari):** Compartir → «Agregar a inicio».
+- **Android (Chrome):** menú ⋮ → «Instalar app» / «Añadir a pantalla de inicio».
+
+Esto sólo funciona con la web publicada en su propio dominio (p. ej. Cloudflare Pages), no dentro de Claude Artifacts.
+
+### Cloudflare Pages (recomendado)
+
+El repositorio incluye `public/_headers` (caché y `noindex`), `wrangler.toml` y `.node-version` (Node 22). El archivo más grande es el video HD de la intro (22 MB), por debajo del límite de 25 MiB por archivo de Cloudflare Pages. Cloudflare sirve los videos con peticiones *Range*, necesarias para Safari/iOS.
 
 **Opción A — desde GitHub (panel de Cloudflare):** Workers & Pages → Create → Pages → Connect to Git → este repositorio y la rama `claude/brave-hamilton-1oc3xl` → Framework preset: *None* (o Vite) · Build command: `npm run build` · Build output directory: `dist`.
 
