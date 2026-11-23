@@ -15,6 +15,9 @@ import { PrivateEvents } from './sections/PrivateEvents'
 import { Catering } from './sections/Catering'
 import { Services } from './sections/Services'
 import { Visit } from './sections/Visit'
+import { Manifesto } from './sections/Manifesto'
+import { FlavorOrbit } from './sections/FlavorOrbit'
+import { Stamp } from './sections/Stamp'
 import { restaurant } from './data/restaurant'
 import { initSmoothScroll, scrollToTarget } from './lib/smoothScroll'
 import { ScrollTrigger } from './lib/gsap'
@@ -52,6 +55,8 @@ function Site() {
         <Hero />
         <Marquee words={[...restaurant.homepageHighlights, 'Cachapas']} />
         <Story />
+        <Manifesto />
+        <FlavorOrbit />
         <Signature />
         <MenuSection />
         <Experience />
@@ -59,6 +64,7 @@ function Site() {
         <PrivateEvents />
         <Catering />
         <Services />
+        <Stamp />
         <Visit />
       </main>
       <Footer />
