@@ -38,13 +38,13 @@ export function Story() {
             src="/images/dining-room-bar.webp"
             alt="The dining room at Maracaibo: brown leather chairs, white tables and a backlit bar with a gold leaf-patterned wall."
             className="aspect-[4/5] rounded-[2px] md:aspect-[5/6]"
-            amount={14}
+            amount={8}
           />
           <ParallaxImage
             src="/images/reception-640.webp"
             alt="Brass lantern and lattice detail at the reception."
             className="absolute -bottom-10 -left-4 hidden aspect-square w-[42%] rounded-[2px] border-[6px] border-ink shadow-2xl shadow-black/60 md:block lg:-left-16"
-            amount={20}
+            amount={10}
           />
         </div>
       </div>

@@ -66,7 +66,7 @@ export function Hero() {
           <source type="image/avif" srcSet="/images/reception.avif" />
           <img
             src="/images/reception.webp"
-            srcSet="/images/reception-640.webp 640w, /images/reception.webp 1280w"
+            srcSet="/images/reception-640.webp 640w, /images/reception.webp 2560w"
             sizes="100vw"
             alt="Maracaibo's reception: the backlit MARACAIBO sign above a brass-lattice host stand flanked by gold lanterns."
             fetchPriority="high"

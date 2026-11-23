@@ -15,7 +15,7 @@ export function Catering() {
             src="/images/signature-platter.webp"
             alt="A shared platter on a wooden board, ready for the table."
             className="aspect-[5/4] rounded-[2px]"
-            amount={14}
+            amount={8}
           />
         </div>
         <Reveal className="order-1 lg:order-2 lg:col-span-5 lg:col-start-8">

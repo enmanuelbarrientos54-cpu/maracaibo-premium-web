@@ -23,7 +23,7 @@ export function ParallaxImage({
   alt,
   className = '',
   imgClassName = '',
-  amount = 12,
+  amount = 8,
   mask = true,
   sizes,
   srcSet,
@@ -36,10 +36,11 @@ export function ParallaxImage({
     const img = q('img')[0]
     gsap.fromTo(
       img,
-      { yPercent: -amount / 2, scale: 1.12 },
+      // only as much zoom as the travel needs, so small photos are not enlarged further
+      { yPercent: -amount / 2, scale: 1 + amount / 100 },
       {
         yPercent: amount / 2,
-        scale: 1.12,
+        scale: 1 + amount / 100,
         ease: 'none',
         scrollTrigger: { trigger: ref.current, start: 'top bottom', end: 'bottom top', scrub: true },
       },
@@ -58,7 +59,7 @@ export function ParallaxImage({
     }
   })
   return (
-    <figure ref={ref} className={`relative overflow-hidden ${className}`}>
+    <figure ref={ref} className={`${/\b(absolute|fixed)\b/.test(className) ? '' : 'relative'} overflow-hidden ${className}`}>
       <img
         src={src}
         srcSet={srcSet}

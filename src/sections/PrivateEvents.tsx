@@ -36,7 +36,7 @@ export function PrivateEvents() {
               src="/images/reception.webp"
               alt="The reception at Maracaibo, with brass lanterns and the illuminated name."
               className="aspect-[4/3] rounded-[2px]"
-              amount={14}
+              amount={8}
             />
           </div>
         </div>

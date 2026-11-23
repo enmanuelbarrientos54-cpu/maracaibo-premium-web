@@ -14,7 +14,7 @@ export function Reservations() {
           src="/images/dining-room-bar.webp"
           alt="Maracaibo's dining room set for service, with the backlit bar beyond."
           className="aspect-[4/3] lg:aspect-auto lg:h-full"
-          amount={16}
+          amount={8}
         />
 
         <Reveal className="flex flex-col justify-center px-[clamp(1.25rem,5vw,5rem)] py-20 lg:py-28">
