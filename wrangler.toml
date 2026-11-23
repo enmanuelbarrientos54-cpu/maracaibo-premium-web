@@ -1,0 +1,4 @@
+# Cloudflare Pages project config (used by `npx wrangler pages deploy`).
+name = "maracaibo-premium-web"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-11-01"

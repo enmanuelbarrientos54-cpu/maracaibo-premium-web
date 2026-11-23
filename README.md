@@ -18,16 +18,18 @@ Parámetros útiles: `?intro=skip` (entra directo a la web) · `?intro=play` (fu
 
 ## Introducción cinematográfica
 
-`src/components/CinematicIntro.tsx` — usa el video auténtico proporcionado (Higgsfield, `spliced.mp4`), re-codificado sin audio:
+`src/components/CinematicIntro.tsx` — usa el video **original** de Higgsfield (`spliced.mp4`, 1920×1080, H.264 High@4.0, 24 fps, ≈8,5 Mbps).
 
-| Archivo | Uso |
-| --- | --- |
-| `public/video/intro-1080.{mp4,webm}` | Escritorio / pantallas grandes (≈5.6 MB / 4.5 MB) |
-| `public/video/intro-720.{mp4,webm}` | Pantallas pequeñas, `saveData` o redes lentas |
-| `public/video/intro-portrait.{mp4,webm}` | Móviles en vertical (recorte central 9:16, ≈1.8 MB) |
-| `public/video/intro-poster*.jpg` | Fotograma de respaldo |
+| Archivo | Qué es | Cuándo se usa |
+| --- | --- | --- |
+| `public/video/intro-original.mp4` | **El master original sin recodificar** (flujo de video idéntico, MD5 verificado); sólo se quitó la pista de audio, ya que la intro es muda. 16,0 MB | Escritorio, portátiles, pantallas Full HD / 2K / 4K, móviles y tabletas en horizontal |
+| `public/video/intro-portrait.mp4` | Recorte central 608×1080 del original a **resolución nativa** (sin reescalar), x264 CRF 14 (SSIM 0,996 frente al original). 7,5 MB | Pantallas táctiles en vertical (móviles, tabletas) |
+| `public/video/intro-720.mp4` | Versión 720p ligera | Sólo con «Ahorro de datos» o red 2G |
+| `public/video/intro-poster*.jpg` | Primer fotograma del original | Mientras carga el video |
 
-Comportamiento: autoplay · muted · playsInline · sin controles · sin bucle · «Skip intro» (y tecla Esc) · se recuerda en `sessionStorage` · respeta `prefers-reduced-motion` (no se reproduce) · si el navegador bloquea el autoplay aparece «Play the film» · si el video falla o la red se atasca, se muestra el póster y continúa la transición. Al llegar a la recepción la escena se oscurece, aparece el logotipo MARACAIBO y una cortina revela la portada con la **fotografía real** de la misma recepción. La intro se identifica en pantalla como «Concept film · AI-rendered».
+La selección se hace por **tipo de dispositivo**, no por el tamaño de la ventana: una ventana estrecha en un ordenador recibe igualmente el original. 1080p es la resolución nativa del master; en pantallas 2K/4K el navegador lo escala sin inventar detalle. El video no lleva filtros, desenfoques ni transformaciones (tampoco durante la transición final, que sólo oscurece la escena con un velo).
+
+Comportamiento: autoplay · muted · playsInline · sin controles · sin bucle · «Skip intro» (y tecla Esc) · se recuerda en `sessionStorage` · respeta `prefers-reduced-motion` · si el navegador bloquea el autoplay aparece «Play the film» · si el video falla se muestra el póster y continúa la transición. La intro se identifica como «Concept film · AI-rendered».
 
 ## Contenido y fuentes
 
@@ -69,7 +71,26 @@ Para completar el menú basta con añadir objetos a `menuItems` en `src/data/men
 
 ## Despliegue
 
-Listo para Vercel (`vercel.json`) o Netlify (`netlify.toml`): importar el repositorio, build `npm run build`, salida `dist/`. Para Cloudflare Pages / GitHub Pages / cualquier hosting estático, subir el contenido de `dist/`.
+### Cloudflare Pages (recomendado para servir el video original)
+
+El repositorio incluye `public/_headers` (caché y `noindex`), `wrangler.toml` y `.node-version` (Node 22). El archivo más grande es el video original (16,0 MB), por debajo del límite de 25 MiB por archivo de Cloudflare Pages. Cloudflare sirve los videos con peticiones *Range*, necesarias para Safari/iOS.
+
+**Opción A — desde GitHub (panel de Cloudflare):** Workers & Pages → Create → Pages → Connect to Git → este repositorio y la rama `claude/brave-hamilton-1oc3xl` → Framework preset: *None* (o Vite) · Build command: `npm run build` · Build output directory: `dist`.
+
+**Opción B — desde la terminal:**
+
+```bash
+npm ci && npm run build
+npx wrangler pages deploy dist --project-name maracaibo-premium-web --branch preview
+```
+
+Usar una rama distinta de la de producción (`--branch preview`) genera una URL de vista previa. Para que sólo la vean personas autorizadas, protegerla con Cloudflare Access (Zero Trust → Access → aplicación para `*.maracaibo-premium-web.pages.dev`).
+
+### Otros
+
+También funciona en Vercel (`vercel.json`) o Netlify (`netlify.toml`): build `npm run build`, salida `dist/`.
+
+> **Claude Artifacts** no puede servir el original: su límite es 15 MB por archivo y el master ocupa 16,0 MB. La vista previa en Artifacts usa la mejor codificación que cabe en ese límite; la versión de producción (Cloudflare Pages) usa el original intacto.
 
 ### Para pasar a producción (si el propietario aprueba)
 

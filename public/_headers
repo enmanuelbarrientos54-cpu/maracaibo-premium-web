@@ -1,0 +1,17 @@
+# Cloudflare Pages headers (copied to dist/ at build time)
+
+# Private demo: keep out of search engines until the restaurant approves.
+/*
+  X-Robots-Tag: noindex, nofollow
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Hashed build assets never change.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Intro film (original Higgsfield master) and photography.
+/video/*
+  Cache-Control: public, max-age=604800
+/images/*
+  Cache-Control: public, max-age=604800

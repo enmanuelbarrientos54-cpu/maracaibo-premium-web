@@ -16,25 +16,33 @@ import { startScroll, stopScroll } from '../lib/smoothScroll'
 type Phase = 'loading' | 'playing' | 'blocked' | 'failed' | 'outro'
 
 interface Source {
-  /** Path without extension; both .mp4 (H.264) and .webm (VP9) exist. */
-  base: string
+  src: string
   poster: string
 }
 
 type NetInfo = { saveData?: boolean; effectiveType?: string }
 
+/**
+ * Source selection is based on the DEVICE, never on the window size, so a
+ * narrow or tall browser window on a desktop still gets the full film.
+ *
+ * - Default (desktop, laptop, Full HD / 2K / 4K, landscape phones & tablets):
+ *   the original Higgsfield master, 1920×1080, untouched video stream
+ *   (only the silent audio track was removed). 1080p is the master's native
+ *   resolution: larger screens are upscaled by the browser, nothing is faked.
+ * - Touch devices held upright: a native-resolution 608×1080 centre crop of the
+ *   same master (identical framing to object-fit: cover, no downscaling).
+ * - Data Saver / 2G only: a 720p fallback.
+ */
 function pickSource(): Source {
-  const w = window.innerWidth
-  const h = window.innerHeight
-  const dpr = Math.min(window.devicePixelRatio || 1, 2)
   const conn = (navigator as Navigator & { connection?: NetInfo }).connection
-  const constrained = !!conn?.saveData || /(^|-)2g$|3g/.test(conn?.effectiveType ?? '')
+  const dataSaver = !!conn?.saveData || /^(slow-)?2g$/.test(conn?.effectiveType ?? '')
+  const touch = window.matchMedia('(pointer: coarse)').matches && !window.matchMedia('(any-pointer: fine)').matches
+  const upright = window.matchMedia('(orientation: portrait)').matches
 
-  // Portrait phones get a pre-cropped vertical cut: identical framing to
-  // object-fit: cover, but a fraction of the bytes.
-  if (h > w && w < 900) return { base: '/video/intro-portrait', poster: '/video/intro-poster-portrait.jpg' }
-  if (constrained || w * dpr < 1200) return { base: '/video/intro-720', poster: '/video/intro-poster.jpg' }
-  return { base: '/video/intro-1080', poster: '/video/intro-poster.jpg' }
+  if (dataSaver) return { src: '/video/intro-720.mp4', poster: '/video/intro-poster.jpg' }
+  if (touch && upright) return { src: '/video/intro-portrait.mp4', poster: '/video/intro-poster-portrait.jpg' }
+  return { src: '/video/intro-original.mp4', poster: '/video/intro-poster.jpg' }
 }
 
 /** Captions timed to the film's shots. */
@@ -69,9 +77,9 @@ export function CinematicIntro() {
       const v = video.current
 
       tl.to(q('.intro-chrome'), { autoAlpha: 0, duration: 0.4, ease: 'power2.out' }, 0)
-        // the film settles into darkness so the wordmark never competes with the sign on screen
+        // the film settles into darkness so the wordmark never competes with the sign on screen.
+        // No blur or scale on the video: it stays pixel-sharp to the last frame.
         .to(q('.intro-veil'), { opacity: 0.88, duration: fast ? 0.45 : 1.1, ease: 'power2.inOut' }, 0)
-        .to(q('.intro-media'), { scale: 1.08, filter: 'blur(6px)', duration: fast ? 1.4 : 2.4, ease: 'power1.out' }, 0)
         .fromTo(
           q('.intro-letter'),
           // y: 0 resets the offset GSAP reads from the CSS pre-hide, so only yPercent moves
@@ -88,8 +96,9 @@ export function CinematicIntro() {
           reveal()
         }, 'wipe')
         .to(q('.intro-brand'), { yPercent: -35, autoAlpha: 0, duration: 1.1, ease: 'expo.in' }, 'wipe-=0.15')
-        .to(
+        .fromTo(
           root.current,
+          { clipPath: 'inset(0% 0% 0% 0%)' },
           { clipPath: 'inset(0% 0% 100% 0%)', duration: fast ? 1.05 : 1.35, ease: 'expo.inOut' },
           'wipe',
         )
@@ -103,7 +112,6 @@ export function CinematicIntro() {
   /* ------------------------------------------------------------ lifecycle */
   useLayoutEffect(() => {
     stopScroll()
-    gsap.set(root.current, { clipPath: 'inset(0% 0% 0% 0%)' })
     gsap.fromTo(root.current?.querySelector('.intro-media') ?? null, { opacity: 0 }, { opacity: 1, duration: 0.9 })
     return () => startScroll()
   }, [])
@@ -177,7 +185,6 @@ export function CinematicIntro() {
       className="fixed inset-0 z-[100] overflow-hidden bg-ink text-ivory"
       role="region"
       aria-label="Maracaibo introduction film"
-      style={{ willChange: 'clip-path' }}
     >
       {/* Media */}
       <div className="intro-media absolute inset-0 origin-[50%_60%]">
@@ -199,11 +206,10 @@ export function CinematicIntro() {
           onEnded={() => runOutro(false)}
           onError={() => setPhase((p) => (p === 'outro' ? p : 'failed'))}
         >
-          <source src={`${source.base}.mp4`} type='video/mp4; codecs="avc1.640028"' />
-          {/* Errors on the final <source> mean no candidate could be loaded. */}
+          {/* H.264 High@4.0 — plays in every current browser (Chrome, Edge, Safari, Firefox). */}
           <source
-            src={`${source.base}.webm`}
-            type='video/webm; codecs="vp9"'
+            src={source.src}
+            type='video/mp4; codecs="avc1.640028"'
             onError={() => setPhase((p) => (p === 'outro' ? p : 'failed'))}
           />
         </video>
@@ -226,7 +232,7 @@ export function CinematicIntro() {
           <button
             type="button"
             onClick={skip}
-            className="group flex min-h-11 items-center gap-3 rounded-full border border-ivory/25 bg-ink/25 px-5 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-ivory/90 backdrop-blur-md transition-colors duration-500 hover:border-ivory/60 hover:text-ivory"
+            className="group flex min-h-11 items-center gap-3 rounded-full border border-ivory/25 bg-ink/55 px-5 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-ivory/90 transition-colors duration-500 hover:border-ivory/60 hover:text-ivory"
           >
             Skip intro
             <span aria-hidden className="inline-block transition-transform duration-500 group-hover:translate-x-1">
@@ -254,7 +260,7 @@ export function CinematicIntro() {
         </div>
 
         {phase === 'blocked' && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 bg-ink/40 px-6 text-center backdrop-blur-[2px]">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 bg-ink/55 px-6 text-center">
             <button type="button" onClick={playManually} className="btn btn-solid">
               Play the film <span className="btn-arrow">▸</span>
             </button>
